@@ -1,0 +1,21 @@
+﻿@model List<User>
+
+@{
+    @*Layout = null;*@
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>AllUsers</title>
+</head>
+<body>
+    @foreach (var user in Model)
+    {
+        <span>User n°@user.Id @user.Username</span>
+        <br/>
+    }
+</body>
+</html>

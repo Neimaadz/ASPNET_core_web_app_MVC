@@ -1,0 +1,22 @@
+﻿@model List<Item>
+
+@{@*Layout = null;  // Nav banner from /Shared/_Layout.cshtml (delete this to add)*@}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Items</title>
+</head>
+<body>
+
+    @foreach (var item in Model)
+    {
+        <span>@item.Name</span>
+        <br />
+    }
+
+</body>
+</html>
+

@@ -1,4 +1,37 @@
 ﻿<Properties StartupConfiguration="{9E2357FA-60E0-4D99-A025-563FCD73B012}|Default">
-  <MonoDevelop.Ide.ItemProperties.ASPNET__core__web__app__MVC FirstBuild="True" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="ASPNET_core_web_app_MVC/Startup.cs">
+    <Files>
+      <File FileName="ASPNET_core_web_app_MVC/Data/Users.xml" Line="1" Column="1" />
+      <File FileName="ASPNET_core_web_app_MVC/Data/Items.json" Line="5" Column="19" />
+      <File FileName="ASPNET_core_web_app_MVC/Startup.cs" Line="23" Column="53" />
+      <File FileName="ASPNET_core_web_app_MVC/Controllers/HomeController.cs" Line="226" Column="48" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="ASPNET_core_web_app_MVC" expanded="True">
+            <Node name="ASPNET_core_web_app_MVC" expanded="True">
+              <Node name="Authentication" expanded="True" />
+              <Node name="Controllers" expanded="True" />
+              <Node name="Data" expanded="True" />
+              <Node name="Models" expanded="True" />
+              <Node name="Properties" expanded="True" />
+              <Node name="Views" expanded="True">
+                <Node name="Home" expanded="True" />
+                <Node name="Shared" expanded="True" />
+              </Node>
+              <Node name="Startup.cs" selected="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.ASPNET__core__web__app__MVC PreferredExecutionTarget="/Applications/Google Chrome.app" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MultiItemStartupConfigurations />
 </Properties>
