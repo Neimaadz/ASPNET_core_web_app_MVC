@@ -10,6 +10,7 @@ using ASPNET_core_web_app_MVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace ASPNET_core_web_app_MVC.Controllers
@@ -57,6 +58,34 @@ namespace ASPNET_core_web_app_MVC.Controllers
             return View(allItems);
         }
 
+        // =======================================================================
+        // Add items
+        // =======================================================================
+        [HttpGet("additems")]
+        public IActionResult AddItems()
+        {
+            return View();
+        }
+
+        [HttpPost("additems")]  // define route : https://localhost:<port>/items
+        public IActionResult AddItems([FromForm] ItemCredential itemCredential)
+        {
+            List<Item> ListItems = ReadItemsJSON();
+            int countItems = ListItems.Count;
+            string name = itemCredential.Name;
+
+            Item item = new Item()
+            {
+                ItemId = countItems+1,
+                UserId = Int32.Parse(User.FindFirstValue("id")),
+                Name = name
+            };
+
+            WriteItemsByUser(item);
+
+            return RedirectToAction("items");
+        }
+
 
         // =======================================================================
         // All users
@@ -89,17 +118,16 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
         [AllowAnonymous]
         [HttpPost("signin")]
-        public IActionResult Signin([FromForm] User newUser)
+        public IActionResult Signin([FromForm] UserCredential userCredential)
         {
-            User user = new User();
+            List<User> ListUsers = ReadUserXML();
+            int countUsers = ListUsers.Count;
+            string username = userCredential.Username;
+            string password = userCredential.Password;
 
-            int id = newUser.Id;
-            string username = newUser.Username;
-            string password = newUser.Password;
-
-            user = new User()
+            User user = new User()
             {
-                Id = 0,
+                Id = countUsers + 1,
                 Username = username,
                 Password = password
             };
@@ -241,6 +269,23 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
 
         // =======================================================================
+        // Items JSON File : write to JSON file
+        // =======================================================================
+        void WriteItemsByUser(Item item)
+        {
+            List<Item> Items = ReadItemsJSON();
+
+            Items.Add(item);
+            var allItems = new { Items };
+
+            string json = JsonConvert.SerializeObject(allItems, Formatting.Indented);
+            // Permet d'écrire sur le fichier new.json
+            System.IO.File.WriteAllText(UriItemsJSON, json);
+
+        }
+
+
+        // =======================================================================
         // Items JSON File : read all items from JSON file
         // =======================================================================
         static List<Item> ReadItemsJSON()
@@ -291,14 +336,14 @@ namespace ASPNET_core_web_app_MVC.Controllers
         static void WriteUserXML(User user)
         {
             List<User> ListUsers = ReadUserXML();
-            int countUser = ListUsers.Count;
+            int countUsers = ListUsers.Count;
 
             XDocument XMLFile = XDocument.Load(UriUserXML);
 
             XMLFile.Element("Users")
                 .Elements("User")
-                .Where(item => Convert.ToInt32(item.Element("Id").Value) == countUser).FirstOrDefault()
-                .AddAfterSelf(new XElement("User", new XElement("Id", countUser + 1), new XElement("Username", user.Username), new XElement("Password", user.Password)));
+                .Where(item => Convert.ToInt32(item.Element("Id").Value) == countUsers).FirstOrDefault()
+                .AddAfterSelf(new XElement("User", new XElement("Id", user.Id), new XElement("Username", user.Username), new XElement("Password", user.Password)));
 
             XMLFile.Save(UriUserXML);
         }
