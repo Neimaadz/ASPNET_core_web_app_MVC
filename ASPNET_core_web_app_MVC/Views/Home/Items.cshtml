@@ -1,4 +1,4 @@
-﻿@model List<Item>
+﻿@model IEnumerable<ASPNET_core_web_app_MVC.Models.Item>
 
 @{@*Layout = null;  // Nav banner from /Shared/_Layout.cshtml (delete this to add)*@}
 
@@ -11,11 +11,34 @@
 </head>
 <body>
 
-    @foreach (var item in Model)
-    {
-        <span>@item.Name</span>
-        <br />
-    }
+    <table cellpadding="0" cellspacing="0">
+        <tr>
+            <th colspan="2" align="center">All my items</th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td><strong>Name: </strong></td>
+                <td>
+                    &nbsp;@item.Name
+                </td>
+                <td>
+                    &nbsp;
+                    @*@Html.ActionLink("Delete", "DeleteItems",
+                        new { id = @item.ItemId },
+                        new { @class = "btn btn-primary", @style = "color:white" })*@
+                    @using (Html.BeginForm("DeleteItems", "Home", new { id = @item.ItemId }, FormMethod.Post))
+                    {
+                        <button type="submit" class="btn btn-danger">
+                            Delete
+                        </button>
+                    }
+                </td>
+            </tr>
+        }
+
+    </table>
 
 </body>
 </html>

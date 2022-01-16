@@ -58,6 +58,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
             return View(allItems);
         }
 
+
         // =======================================================================
         // Add items
         // =======================================================================
@@ -83,6 +84,17 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
             WriteItemsByUser(item);
 
+            return RedirectToAction("items");
+        }
+
+
+        // =======================================================================
+        // Delete item
+        // =======================================================================
+        [HttpPost("deleteItems")]
+        public IActionResult DeleteItems(int id)
+        {
+            DeleteItemsByUser(id);
             return RedirectToAction("items");
         }
 
@@ -265,6 +277,23 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 allItems.Add(items);
             }
             return allItems;
+        }
+
+        // =======================================================================
+        // Items JSON File : delete to JSON file
+        // =======================================================================
+        void DeleteItemsByUser(int id)
+        {
+            int index = 0;
+            List<Item> Items = ReadItemsJSON();
+            Items.ForEach(x => { if (x.ItemId.Equals(id)) index=Items.IndexOf(x); });
+            Items.RemoveAt(index);
+            var allItems = new { Items };
+
+            string json = JsonConvert.SerializeObject(allItems, Formatting.Indented);
+            // Permet d'écrire sur le fichier new.json
+            System.IO.File.WriteAllText(UriItemsJSON, json);
+
         }
 
 

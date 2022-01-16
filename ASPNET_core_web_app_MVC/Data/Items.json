@@ -18,22 +18,7 @@
     {
       "ItemId": 4,
       "UserId": 2,
-      "Name": "azdazad"
-    },
-    {
-      "ItemId": 5,
-      "UserId": 2,
-      "Name": "aaz"
-    },
-    {
-      "ItemId": 6,
-      "UserId": 2,
-      "Name": "a122"
-    },
-    {
-      "ItemId": 7,
-      "UserId": 2,
-      "Name": "caca"
+      "Name": "test"
     }
   ]
 }
