@@ -11,23 +11,60 @@
 </head>
 <body>
 
-    <table cellpadding="0" cellspacing="0">
-        <tr>
-            <th colspan="2" align="center">All my items</th>
-        </tr>
+    <div style="display:inline-flex; margin-bottom:20px">
+        <h4 style="margin-right:10px">Filter: </h4>
+        <button type="submit" class="btn btn-info" style="margin-right:10px">
+            by Name
+        </button>
+        <button type="submit" class="btn btn-info" style="margin-right:10px">
+            by Date
+        </button>
+        <button type="submit" class="btn btn-info">
+            by Type
+        </button>
+    </div>
 
-        @foreach (var item in Model)
-        {
+    <table class="table table-striped">
+        <thead>
             <tr>
-                <td><strong>Name: </strong></td>
+                <th scope="col">Name: </th>
+                <th scope="col">Ajouté le: </th>
+                <th scope="col">Type: </th>
+                <th scope="col">Localisation: </th>
+                <th scope="col">Description: </th>
+                <th scope="col">Edition: </th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+            <tr>
                 <td>
-                    &nbsp;@item.Name
+                    @item.Name
                 </td>
                 <td>
-                    &nbsp;
+                    @item.Date
+                </td>
+                <td>
+                    @item.Type
+                </td>
+                <td>
+                    @item.Localisation
+                </td>
+                <td>
+                    @item.Description
+                </td>
+                <td style="display:inline-flex">
                     @*@Html.ActionLink("Delete", "DeleteItems",
-                        new { id = @item.ItemId },
-                        new { @class = "btn btn-primary", @style = "color:white" })*@
+            new { id = @item.ItemId },
+            new { @class = "btn btn-primary", @style = "color:white" })*@
+                    @using (Html.BeginForm("EditItems", "Home", new { id = @item.ItemId }, FormMethod.Get))
+                    {
+                        <button type="submit" class="btn btn-warning" style="margin-right:10px">
+                            Edit
+                        </button>
+                    }
                     @using (Html.BeginForm("DeleteItems", "Home", new { id = @item.ItemId }, FormMethod.Post))
                     {
                         <button type="submit" class="btn btn-danger">
@@ -36,7 +73,8 @@
                     }
                 </td>
             </tr>
-        }
+            }
+        </tbody>
 
     </table>
 

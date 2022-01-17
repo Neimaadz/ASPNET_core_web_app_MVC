@@ -74,16 +74,40 @@ namespace ASPNET_core_web_app_MVC.Controllers
             List<Item> ListItems = ReadItemsJSON();
             int countItems = ListItems.Count;
             string name = itemCredential.Name;
+            string date = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
+            string type = itemCredential.Type;
+            string localistion = itemCredential.Localisation;
+            string description = itemCredential.Description;
 
             Item item = new Item()
             {
-                ItemId = countItems+1,
+                ItemId = countItems + 1,
                 UserId = Int32.Parse(User.FindFirstValue("id")),
-                Name = name
+                Name = name,
+                Date = date,
+                Type = type,
+                Localisation = localistion,
+                Description = description
             };
 
             WriteItemsByUser(item);
 
+            return RedirectToAction("items");
+        }
+
+        // =======================================================================
+        // Edit item
+        // =======================================================================
+        [HttpGet("editItems")]
+        public IActionResult EditItems(int id)
+        {
+            return View();
+        }
+
+        [HttpPost("editItems")]
+        public IActionResult EditItems([FromForm] ItemCredential itemCredential)
+        {
+            //DeleteItemsByUser(id);
             return RedirectToAction("items");
         }
 
@@ -268,7 +292,11 @@ namespace ASPNET_core_web_app_MVC.Controllers
                               {
                                   ItemId = items.ItemId,
                                   UserId = items.UserId,
-                                  Name = items.Name
+                                  Name = items.Name,
+                                  Date = items.Date,
+                                  Type = items.Type,
+                                  Localisation = items.Localisation,
+                                  Description = items.Description
                               };
 
             // Appel de la requête
