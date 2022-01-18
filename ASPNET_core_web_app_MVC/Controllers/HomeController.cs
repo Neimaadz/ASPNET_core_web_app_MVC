@@ -95,17 +95,10 @@ namespace ASPNET_core_web_app_MVC.Controllers
             return RedirectToAction("items");
         }
 
+
         // =======================================================================
         // Edit item
         // =======================================================================
-        [HttpGet("editItems/{itemId}")]
-        public IActionResult EditItems(int itemId)
-        {
-            Item item = FindItemByItemId(itemId);
-
-            return View(item);
-        }
-
         [HttpPost("editItems/{itemId}")]
         public IActionResult EditItems(int itemId, [FromForm] Item item)
         {
