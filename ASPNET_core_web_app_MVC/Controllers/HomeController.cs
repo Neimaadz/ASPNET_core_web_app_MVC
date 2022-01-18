@@ -22,8 +22,8 @@ namespace ASPNET_core_web_app_MVC.Controllers
     {
         // private readonly ILogger<HomeController> _logger;
         private readonly IJwtAuth jwtAuth;
-        private static string UriUserXML = $@"{Directory.GetCurrentDirectory()}/Data/Users.xml";
-        private static string UriItemsJSON = $@"{Directory.GetCurrentDirectory()}/Data/Items.json";
+        private string UriUserXML = $@"{Directory.GetCurrentDirectory()}/Data/Users.xml";
+        private string UriItemsJSON = $@"{Directory.GetCurrentDirectory()}/Data/Items.json";
 
         // public HomeController(ILogger<HomeController> logger)
         public HomeController(IJwtAuth jwtAuth)
@@ -53,7 +53,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         public IActionResult Items()
         {
             List<Item> allItems = new List<Item>();
-            allItems = ReadItemsByUser();
+            allItems = ReadUserItemsJSON(); // read only user's items
 
             return View(allItems);
         }
@@ -71,7 +71,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         [HttpPost("additems")]  // define route : https://localhost:<port>/items
         public IActionResult AddItems([FromForm] ItemCredential itemCredential)
         {
-            List<Item> ListItems = ReadUserItemsJSON();
+            List<Item> ListItems = ReadItemsJSON(); // to find the highest id in ALL items list
             int itemId = ListItems.Max(item => item.ItemId);    // find the highest id
             string name = itemCredential.Name;
             string date = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
@@ -90,7 +90,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 Description = description
             };
 
-            WriteUserItemJSON(item);
+            WriteItemJSON(item);
 
             return RedirectToAction("items");
         }
@@ -101,7 +101,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         [HttpGet("editItems/{itemId}")]
         public IActionResult EditItems(int itemId)
         {
-            Item item = FindItemsByItemId(itemId);
+            Item item = FindItemByItemId(itemId);
 
             return View(item);
         }
@@ -109,7 +109,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         [HttpPost("editItems/{itemId}")]
         public IActionResult EditItems(int itemId, [FromForm] Item item)
         {
-            EditUserItemByItemId(itemId, item);
+            EditItemByItemId(itemId, item);
             return RedirectToAction("items");
         }
 
@@ -120,7 +120,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         [HttpPost("deleteItems")]
         public IActionResult DeleteItems(int itemId)
         {
-            DeleteUserItemByItemId(itemId);
+            DeleteItemByItemId(itemId);
             return RedirectToAction("items");
         }
 
@@ -132,7 +132,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         public IActionResult Users()
         {
             List<User> allUsers = new List<User>();
-            allUsers = ReadUserXML();
+            allUsers = ReadUsersXML();
 
             return View(allUsers);
         }
@@ -179,7 +179,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
             else
             {
                 List<User> allUsers = new List<User>();
-                allUsers = ReadUserXML();
+                allUsers = ReadUsersXML();
 
                 if (!IsUserAlreadyExist(allUsers, user))
                 {
@@ -273,12 +273,12 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
 
         // =======================================================================
-        // Items JSON File : find item by item id
+        // Items find : find item by item id
         // =======================================================================
-        static Item FindItemsByItemId(int itemId)
+        Item FindItemByItemId(int itemId)
         {
             Item item = new Item();
-            List<Item> ListItems = ReadUserItemsJSON();
+            List<Item> ListItems = ReadItemsJSON();
 
             // Utilisation du ForEach() au lieu de LinQ car qu'une seule unique ID
             ListItems.ForEach(x => { if (x.ItemId.Equals(itemId)) item = x; });
@@ -287,15 +287,75 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
 
         // =======================================================================
-        // Items JSON File : read all items from JSON file
+        // Items edit : find item by item id
         // =======================================================================
-        List<Item> ReadItemsByUser()
+        void EditItemByItemId(int itemId, Item item)
+        {
+            List<Item> Items = ReadItemsJSON();
+
+            // Utilisation du ForEach() au lieu de LinQ car qu'une seule unique ID
+            Items.ForEach(x => {
+                if (x.ItemId.Equals(itemId))
+                {
+                    x.Name = item.Name;
+                    x.Type = item.Type;
+                    x.Localisation = item.Localisation;
+                    x.Description = item.Description;
+                }
+            });
+            var allItems = new { Items };   // Permet d'ajouter la propriété "Items" dans JSON
+
+            string json = JsonConvert.SerializeObject(allItems, Formatting.Indented);
+            // Permet d'écrire sur le fichier new.json
+            System.IO.File.WriteAllText(UriItemsJSON, json);
+        }
+
+
+        // =======================================================================
+        // Items delete : delete to JSON file
+        // =======================================================================
+        void DeleteItemByItemId(int itemId)
+        {
+            int index = 0;
+            List<Item> Items = ReadItemsJSON();
+
+            // Utilisation du ForEach() au lieu de LinQ car qu'une seule unique ID
+            Items.ForEach(x => { if (x.ItemId.Equals(itemId)) index=Items.IndexOf(x); });
+            Items.RemoveAt(index);
+            var allItems = new { Items };   // Permet d'ajouter la propriété "Items" dans JSON
+
+            string json = JsonConvert.SerializeObject(allItems, Formatting.Indented);
+            // Permet d'écrire sur le fichier new.json
+            System.IO.File.WriteAllText(UriItemsJSON, json);
+
+        }
+
+
+        // =======================================================================
+        // Items JSON File : write to JSON file
+        // =======================================================================
+        void WriteItemJSON(Item item)
+        {
+            List<Item> Items = ReadItemsJSON(); // to add item into ALL items list
+
+            Items.Add(item);
+            var allItems = new { Items };   // Permet d'ajouter la propriété "Items" dans JSON
+
+            string json = JsonConvert.SerializeObject(allItems, Formatting.Indented);
+            // Permet d'écrire sur le fichier new.json
+            System.IO.File.WriteAllText(UriItemsJSON, json);
+
+        }
+
+        // =======================================================================
+        // Items JSON File : read ONLY user's items from JSON file
+        // =======================================================================
+        List<Item> ReadUserItemsJSON()
         {
             List<Item> allItems = new List<Item>();
 
             // Définir ma source de données
-            var listUsers = ReadUserXML();
-            var listItems = ReadUserItemsJSON();
+            var listItems = ReadItemsJSON();
             var currentId = User.FindFirstValue("id");  // get the user id from token
 
             // Création de la requête
@@ -322,71 +382,9 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
 
         // =======================================================================
-        // Items JSON File : find item by item id
-        // =======================================================================
-        static void EditUserItemByItemId(int itemId, Item item)
-        {
-            List<Item> Items = ReadUserItemsJSON();
-
-            // Utilisation du ForEach() au lieu de LinQ car qu'une seule unique ID
-            Items.ForEach(x => {
-                if (x.ItemId.Equals(itemId))
-                {
-                    x.Name = item.Name;
-                    x.Type = item.Type;
-                    x.Localisation = item.Localisation;
-                    x.Description = item.Description;
-                }
-            });
-            var allItems = new { Items };
-
-            string json = JsonConvert.SerializeObject(allItems, Formatting.Indented);
-            // Permet d'écrire sur le fichier new.json
-            System.IO.File.WriteAllText(UriItemsJSON, json);
-        }
-
-
-        // =======================================================================
-        // Items JSON File : delete to JSON file
-        // =======================================================================
-        void DeleteUserItemByItemId(int itemId)
-        {
-            int index = 0;
-            List<Item> Items = ReadUserItemsJSON();
-
-            // Utilisation du ForEach() au lieu de LinQ car qu'une seule unique ID
-            Items.ForEach(x => { if (x.ItemId.Equals(itemId)) index=Items.IndexOf(x); });
-            Items.RemoveAt(index);
-            var allItems = new { Items };
-
-            string json = JsonConvert.SerializeObject(allItems, Formatting.Indented);
-            // Permet d'écrire sur le fichier new.json
-            System.IO.File.WriteAllText(UriItemsJSON, json);
-
-        }
-
-
-        // =======================================================================
-        // Items JSON File : write to JSON file
-        // =======================================================================
-        void WriteUserItemJSON(Item item)
-        {
-            List<Item> Items = ReadUserItemsJSON();
-
-            Items.Add(item);
-            var allItems = new { Items };
-
-            string json = JsonConvert.SerializeObject(allItems, Formatting.Indented);
-            // Permet d'écrire sur le fichier new.json
-            System.IO.File.WriteAllText(UriItemsJSON, json);
-
-        }
-
-
-        // =======================================================================
         // Items JSON File : read all items from JSON file
         // =======================================================================
-        static List<Item> ReadUserItemsJSON()
+        List<Item> ReadItemsJSON()
         {
             List<Item> allItems = new List<Item>();
 
@@ -406,7 +404,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         // Users XML File : read all users from XML file
         // =======================================================================
-        static List<User> ReadUserXML()
+        List<User> ReadUsersXML()
         {
             List<User> allUsers = new List<User>();
 
@@ -431,9 +429,9 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         // Users XML File : write to XML file
         // =======================================================================
-        static void WriteUserXML(User user)
+        void WriteUserXML(User user)
         {
-            List<User> ListUsers = ReadUserXML();
+            List<User> ListUsers = ReadUsersXML();
             int userId = ListUsers.Max(user => user.Id);    // find the highest id
 
             XDocument XMLFile = XDocument.Load(UriUserXML);
@@ -450,7 +448,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         // Check if user already exist
         // =======================================================================
-        static bool IsUserAlreadyExist(List<User> users, User user)
+        bool IsUserAlreadyExist(List<User> users, User user)
         {
             User findUser = users.Find(x => x.Username.Equals(user.Username));
 
