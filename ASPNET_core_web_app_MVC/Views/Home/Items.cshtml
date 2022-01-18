@@ -13,15 +13,25 @@
 
     <div style="display:inline-flex; margin-bottom:20px">
         <h4 style="margin-right:10px">Filter: </h4>
-        <button type="submit" class="btn btn-info" style="margin-right:10px">
-            by Name
-        </button>
-        <button type="submit" class="btn btn-info" style="margin-right:10px">
-            by Date
-        </button>
-        <button type="submit" class="btn btn-info">
-            by Type
-        </button>
+
+        @using (Html.BeginForm("Items", "Home", FormMethod.Get))
+        {
+            <button type="submit" class="btn btn-info" style="margin-right:10px">
+                by Name
+            </button>
+        }
+        @using (Html.BeginForm("Items", "Home", FormMethod.Get))
+        {
+            <button type="submit" class="btn btn-info" style="margin-right:10px">
+                by Date
+            </button>
+        }
+        @using (Html.BeginForm("Items", "Home", FormMethod.Get))
+        {
+            <button type="submit" class="btn btn-info">
+                by Type
+            </button>
+        }
     </div>
 
     <table class="table table-striped">
@@ -59,13 +69,13 @@
                     @*@Html.ActionLink("Delete", "DeleteItems",
             new { id = @item.ItemId },
             new { @class = "btn btn-primary", @style = "color:white" })*@
-                    @using (Html.BeginForm("EditItems", "Home", new { id = @item.ItemId }, FormMethod.Get))
+                    @using (Html.BeginForm("EditItems", "Home", new { itemId = @item.ItemId }, FormMethod.Get))
                     {
                         <button type="submit" class="btn btn-warning" style="margin-right:10px">
                             Edit
                         </button>
                     }
-                    @using (Html.BeginForm("DeleteItems", "Home", new { id = @item.ItemId }, FormMethod.Post))
+                    @using (Html.BeginForm("DeleteItems", "Home", new { itemId = @item.ItemId }, FormMethod.Post))
                     {
                         <button type="submit" class="btn btn-danger">
                             Delete
