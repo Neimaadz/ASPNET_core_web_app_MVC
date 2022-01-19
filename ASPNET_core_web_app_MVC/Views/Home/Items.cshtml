@@ -11,28 +11,7 @@
 </head>
 <body>
 
-    <div style="display:inline-flex; margin-bottom:20px">
-        <h4 style="margin-right:10px">Filter: </h4>
-
-        @using (Html.BeginForm("Items", "Home", FormMethod.Get))
-        {
-            <button type="submit" class="btn btn-info" style="margin-right:10px">
-                by Name
-            </button>
-        }
-        @using (Html.BeginForm("Items", "Home", FormMethod.Get))
-        {
-            <button type="submit" class="btn btn-info" style="margin-right:10px">
-                by Date
-            </button>
-        }
-        @using (Html.BeginForm("Items", "Home", FormMethod.Get))
-        {
-            <button type="submit" class="btn btn-info">
-                by Type
-            </button>
-        }
-    </div>
+    @Html.Partial("~/Views/Shared/SortItemsLayout.cshtml")
 
     <table class="table table-striped">
         <thead>
@@ -49,119 +28,119 @@
 
             @foreach (var item in Model)
             {
-            <tr>
-                <td>
-                    @item.Name
-                </td>
-                <td>
-                    @item.Date
-                </td>
-                <td>
-                    @item.Type
-                </td>
-                <td>
-                    @item.Localisation
-                </td>
-                <td>
-                    @item.Description
-                </td>
-                <td style="display:inline-flex">
-                    @using (Html.BeginForm("EditItems", "Home", new { itemId = @item.ItemId }, FormMethod.Post))
-                    {
-                        var myEditModal = "myEditModal" + @item.ItemId;
+                <tr>
+                    <td>
+                        @item.Name
+                    </td>
+                    <td>
+                        @item.Date
+                    </td>
+                    <td>
+                        @item.Type
+                    </td>
+                    <td>
+                        @item.Localisation
+                    </td>
+                    <td>
+                        @item.Description
+                    </td>
+                    <td style="display:inline-flex">
+                        @using (Html.BeginForm("EditItems", "Home", new { itemId = @item.ItemId }, FormMethod.Post))
+                        {
+                            var myEditModal = "myEditModal" + @item.ItemId;
 
-                        <!-- Button trigger modal -->
-                        <button type="button" class="btn btn-warning"data-toggle="modal" data-target="#@myEditModal" style="margin-right:10px">
-                            Edit
-                        </button>
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#@myEditModal" style="margin-right:10px">
+                                Edit
+                            </button>
 
-                        <!-- Modal -->
-                        <div class="modal fade" id="@myEditModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-lg" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">Edit Item</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <table cellpadding="0" cellspacing="0" class="mx-auto">
-                                            <tr>
-                                                <th colspan="2" align="center">Edit item</th>
-                                            </tr>
-                                            <tr>
-                                                <td>Name: </td>
-                                                <td>
-                                                    @Html.TextBoxFor(m => @item.Name, new { maxlength = "50", required = "required" })
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Type: </td>
-                                                <td>
-                                                    @Html.TextBoxFor(m => @item.Type, new { required = "required" })
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Localisation: </td>
-                                                <td>
-                                                    @Html.TextBoxFor(m => @item.Localisation, new { required = "required" })
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Description: </td>
-                                                <td>
-                                                    @Html.TextAreaFor(m => @item.Description, new { maxlength = "100", rows = "3", cols = "40", @style = "resize: none;", required = "required"})
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="submit" class="btn btn-warning">
-                                            Edit
-                                        </button>
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    }
-
-
-                    @using (Html.BeginForm("DeleteItems", "Home", new { itemId = @item.ItemId }, FormMethod.Post))
-                    {
-                        var myDeleteModal = "myDeleteModal" + @item.ItemId;
-
-                        <!-- Button trigger modal -->
-                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#@myDeleteModal">
-                            Delete
-                        </button>
-
-                        <!-- Modal -->
-                        <div class="modal fade" id="@myDeleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">Delete Item</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        Are you sur to delete ?
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="submit" class="btn btn-danger">
-                                            Delete
-                                        </button>
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <!-- Modal -->
+                            <div class="modal fade" id="@myEditModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Edit Item</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <table cellpadding="0" cellspacing="0" class="mx-auto">
+                                                <tr>
+                                                    <th colspan="2" align="center">Edit item</th>
+                                                </tr>
+                                                <tr>
+                                                    <td>Name: </td>
+                                                    <td>
+                                                        @Html.TextBoxFor(m => @item.Name, new { maxlength = "50", required = "required" })
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Type: </td>
+                                                    <td>
+                                                        @Html.TextBoxFor(m => @item.Type, new { required = "required" })
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Localisation: </td>
+                                                    <td>
+                                                        @Html.TextBoxFor(m => @item.Localisation, new { required = "required" })
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Description: </td>
+                                                    <td>
+                                                        @Html.TextAreaFor(m => @item.Description, new { maxlength = "100", rows = "3", cols = "40", @style = "resize: none;", required = "required" })
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-warning">
+                                                Edit
+                                            </button>
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    }
-                </td>
-            </tr>
+                        }
+
+
+                        @using (Html.BeginForm("DeleteItems", "Home", new { itemId = @item.ItemId }, FormMethod.Post))
+                        {
+                            var myDeleteModal = "myDeleteModal" + @item.ItemId;
+
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#@myDeleteModal">
+                                Delete
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="@myDeleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Delete Item</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Are you sur to delete ?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-danger">
+                                                Delete
+                                            </button>
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </td>
+                </tr>
             }
         </tbody>
 

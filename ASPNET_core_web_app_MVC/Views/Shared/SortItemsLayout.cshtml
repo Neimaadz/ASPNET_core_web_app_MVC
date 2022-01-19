@@ -1,0 +1,85 @@
+﻿
+
+<div style="display:inline-flex; margin-bottom:20px">
+    <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+
+
+        <div class="input-group mr-5">
+            <input type="text"
+                    class="form-control"
+                    placeholder="Search..."
+                    aria-label="Search"
+                    aria-describedby="btnGroupAddon"
+                    style="width:350px">
+            <button type="button" class="btn btn-outline-secondary">Search</button>
+        </div>
+
+
+        <div class="btn-group me-2 ml-5" role="group" aria-label="First group">
+            <h5 class="mr-2">Sort: </h5>
+            <div class="dropdown mx-1">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    by Name
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    @using (Html.BeginForm("Items", "Home", new { sort = "Name", direction = "ASC" }, FormMethod.Get))
+                    {
+                        <button type="submit" class="dropdown-item btn btn-outline-secondary">Ascending</button>
+                    }
+                    @using (Html.BeginForm("Items", "Home", new { sort = "Name", direction = "DSC" }, FormMethod.Get))
+                    {
+                        <button type="submit" class="dropdown-item btn btn-outline-secondary">Descending</button>
+                    }
+                </div>
+            </div>
+            <div class="dropdown mx-1">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    by Date
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    @using (Html.BeginForm("Items", "Home", new { sort = "Date", direction = "ASC" }, FormMethod.Get))
+                    {
+                        <button type="submit" class="dropdown-item btn btn-outline-secondary">Ascending</button>
+                    }
+                    @using (Html.BeginForm("Items", "Home", new { sort = "Date", direction = "DSC" }, FormMethod.Get))
+                    {
+                        <button type="submit" class="dropdown-item btn btn-outline-secondary">Descending</button>
+                    }
+                </div>
+            </div>
+            <div class="dropdown mx-1">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    by Type
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    @using (Html.BeginForm("Items", "Home", new { sort = "Type", direction = "ASC" }, FormMethod.Get))
+                    {
+                        <button type="submit" class="dropdown-item btn btn-outline-secondary">Ascending</button>
+                    }
+                    @using (Html.BeginForm("Items", "Home", new { sort = "Type", direction = "DSC" }, FormMethod.Get))
+                    {
+                        <button type="submit" class="dropdown-item btn btn-outline-secondary">Descending</button>
+                    }
+                </div>
+            </div>
+            <div class="dropdown mx-1">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    by Localisation
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    @using (Html.BeginForm("Items", "Home", new { sort = "Localisation", direction = "ASC" }, FormMethod.Get))
+                    {
+                        <button type="submit" class="dropdown-item btn btn-outline-secondary">Ascending</button>
+                    }
+                    @using (Html.BeginForm("Items", "Home", new { sort = "Localisation", direction = "DSC" }, FormMethod.Get))
+                    {
+                        <button type="submit" class="dropdown-item btn btn-outline-secondary">Descending</button>
+                    }
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+</div>

@@ -1,11 +1,9 @@
 ﻿<Properties StartupConfiguration="{9E2357FA-60E0-4D99-A025-563FCD73B012}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="ASPNET_core_web_app_MVC/Startup.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="ASPNET_core_web_app_MVC/Views/Shared/SortItemsLayout.cshtml">
     <Files>
-      <File FileName="ASPNET_core_web_app_MVC/Data/Users.xml" Line="12" Column="10" />
-      <File FileName="ASPNET_core_web_app_MVC/Data/Items.json" Line="16" Column="34" />
-      <File FileName="ASPNET_core_web_app_MVC/Controllers/HomeController.cs" Line="91" Column="15" />
-      <File FileName="ASPNET_core_web_app_MVC/Views/Home/Items.cshtml" Line="83" Column="94" />
-      <File FileName="ASPNET_core_web_app_MVC/Startup.cs" Line="75" Column="63" />
+      <File FileName="ASPNET_core_web_app_MVC/Controllers/HomeController.cs" Line="35" Column="25" />
+      <File FileName="ASPNET_core_web_app_MVC/Views/Home/Items.cshtml" Line="16" Column="40" />
+      <File FileName="ASPNET_core_web_app_MVC/Views/Shared/SortItemsLayout.cshtml" Line="13" Column="15" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -19,9 +17,10 @@
               <Node name="Properties" expanded="True" />
               <Node name="Views" expanded="True">
                 <Node name="Home" expanded="True" />
-                <Node name="Shared" expanded="True" />
+                <Node name="Shared" expanded="True">
+                  <Node name="SortItemsLayout.cshtml" selected="True" />
+                </Node>
               </Node>
-              <Node name="Startup.cs" selected="True" />
             </Node>
           </Node>
         </State>

@@ -5,7 +5,7 @@
       "UserId": 2,
       "Name": "Damien",
       "Date": "17/01/2022 19:39",
-      "Type": "yo",
+      "Type": "Musée",
       "Localisation": "Maison",
       "Description": "Petit hotel sur la plage de Saint-Pierre"
     },
@@ -53,6 +53,24 @@
       "Type": "lol",
       "Localisation": "bonjour",
       "Description": "TEST"
+    },
+    {
+      "ItemId": 11,
+      "UserId": 2,
+      "Name": "Le Before",
+      "Date": "19/01/2022 21:56",
+      "Type": "Bar",
+      "Localisation": "Saint-Pierre",
+      "Description": "Bar dansant localisé à coté du cinéma de Saint-Pierre"
+    },
+    {
+      "ItemId": 12,
+      "UserId": 2,
+      "Name": "Showroom",
+      "Date": "20/01/2022 00:16",
+      "Type": "Boite de nuit",
+      "Localisation": "Saint-Pierre",
+      "Description": "Boite de nuit sur le front de mer de Saint-Pierre"
     }
   ]
 }

@@ -46,6 +46,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
             return View();
         }
 
+
         // =======================================================================
         // All items
         // =======================================================================
@@ -53,9 +54,21 @@ namespace ASPNET_core_web_app_MVC.Controllers
         public IActionResult Items()
         {
             List<Item> allItems = new List<Item>();
-            allItems = ReadUserItemsJSON(); // read only user's items
+            allItems = ReadUserItemsJSON("", ""); // read only user's items
 
             return View(allItems);
+        }
+
+        // =======================================================================
+        // All items
+        // =======================================================================
+        [HttpGet("items/{sort}+{direction}")]  // define route : https://localhost:<port>/items
+        public IActionResult Items(string sort, string direction)
+        {
+            List<Item> allItems = new List<Item>();
+            allItems = ReadUserItemsJSON(sort, direction); // read only user's items
+
+            return View("items", allItems);
         }
 
 
@@ -343,7 +356,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         // Items JSON File : read ONLY user's items from JSON file
         // =======================================================================
-        List<Item> ReadUserItemsJSON()
+        List<Item> ReadUserItemsJSON(string sort, string direction)
         {
             List<Item> allItems = new List<Item>();
 
@@ -351,25 +364,43 @@ namespace ASPNET_core_web_app_MVC.Controllers
             var listItems = ReadItemsJSON();
             var currentId = User.FindFirstValue("id");  // get the user id from token
 
-            // Création de la requête
-            var itemsByUser = from items in listItems
-                              where items.UserId == Int32.Parse(currentId)
-                              select new Item()
-                              {
-                                  ItemId = items.ItemId,
-                                  UserId = items.UserId,
-                                  Name = items.Name,
-                                  Date = items.Date,
-                                  Type = items.Type,
-                                  Localisation = items.Localisation,
-                                  Description = items.Description
-                              };
+            var propertyInfo = typeof(Item);
 
-            // Appel de la requête
-            foreach (var items in itemsByUser)
+            if (direction.Equals("ASC"))
             {
-                allItems.Add(items);
+                var itemsByUser = listItems.Where(items => items.UserId == Int32.Parse(currentId))
+                    .OrderBy(x => propertyInfo.GetProperty(sort).GetValue(x, null));    // get property of Sort
+
+                // Appel de la requête
+                foreach (var items in itemsByUser)
+                {
+                    allItems.Add(items);
+                }
             }
+            else if (direction.Equals("DSC"))
+            {
+                var itemsByUser = listItems.Where(items => items.UserId == Int32.Parse(currentId))
+                    .OrderByDescending(x => propertyInfo.GetProperty(sort).GetValue(x, null));
+
+                // Appel de la requête
+                foreach (var items in itemsByUser)
+                {
+                    allItems.Add(items);
+                }
+            }
+            // Default
+            else
+            {
+                var itemsByUser = listItems.Where(items => items.UserId == Int32.Parse(currentId))
+                    .OrderBy(x => propertyInfo.GetProperty("Date").GetValue(x, null));
+
+                // Appel de la requête
+                foreach (var items in itemsByUser)
+                {
+                    allItems.Add(items);
+                }
+            }
+
             return allItems;
         }
 
