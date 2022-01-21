@@ -5,8 +5,8 @@
       "UserId": 2,
       "Name": "Damien",
       "Date": "17/01/2022 19:39",
-      "Type": "Musée",
-      "Localisation": "Maison",
+      "Type": "Bar",
+      "Localisation": "Cilaos",
       "Description": "Petit hotel sur la plage de Saint-Pierre"
     },
     {
@@ -15,7 +15,7 @@
       "Name": "Piton de la Fournaise",
       "Date": "17/01/2022 19:43",
       "Type": "Randonnée",
-      "Localisation": "Plaine des Cafres",
+      "Localisation": "La Plaine des Cafres",
       "Description": "Volcan toujours en activité"
     },
     {

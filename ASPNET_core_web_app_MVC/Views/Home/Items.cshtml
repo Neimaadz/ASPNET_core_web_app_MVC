@@ -78,13 +78,13 @@
                                                 <tr>
                                                     <td>Type: </td>
                                                     <td>
-                                                        @Html.TextBoxFor(m => @item.Type, new { required = "required" })
+                                                        @Html.DropDownListFor(m => @item.Type, new SelectList(ViewBag.Types, @item.Type), "Type", new { required = "required" })
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td>Localisation: </td>
                                                     <td>
-                                                        @Html.TextBoxFor(m => @item.Localisation, new { required = "required" })
+                                                        @Html.DropDownListFor(m => @item.Localisation, new SelectList(ViewBag.Communes, @item.Localisation), "Localisation", new { required = "required" })
                                                     </td>
                                                 </tr>
                                                 <tr>

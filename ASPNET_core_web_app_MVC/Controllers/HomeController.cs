@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Claims;
 using System.Xml.Linq;
 using ASPNET_core_web_app_MVC.Authentication;
@@ -10,6 +11,7 @@ using ASPNET_core_web_app_MVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -50,27 +52,36 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         // All items
         // =======================================================================
-        [HttpGet("items")]  // define route : https://localhost:<port>/items
-        public IActionResult Items()
+        [HttpGet("items")]
+        [HttpGet("items/{filter=null}+{sort=null}+{direction=null}")]
+        public IActionResult Items(string filter, string sort, string direction)
         {
+            List<string> allTypes = new List<string>();
+            allTypes = ReadTypesJSON();
+            ViewBag.Types = allTypes;
+
+            List<string> allCommunes = new List<string>();
+            allCommunes = ReadCommunesJSON();
+            ViewBag.Communes = allCommunes;
+
             List<Item> allItems = new List<Item>();
-            allItems = ReadUserItemsJSON("", ""); // read only user's items
+            allItems = ReadUserItemsJSON(filter, sort, direction); // read only user's items
 
             return View(allItems);
         }
 
-        // =======================================================================
-        // All items
-        // =======================================================================
-        [HttpGet("items/{sort}+{direction}")]  // define route : https://localhost:<port>/items
-        public IActionResult Items(string sort, string direction)
+        public IActionResult SortItemsLayout()
         {
-            List<Item> allItems = new List<Item>();
-            allItems = ReadUserItemsJSON(sort, direction); // read only user's items
+            List<string> allTypes = new List<string>();
+            allTypes = ReadTypesJSON();
+            ViewBag.Types = allTypes;
 
-            return View("items", allItems);
+            List<string> allCommunes = new List<string>();
+            allCommunes = ReadCommunesJSON();
+            ViewBag.Communes = allCommunes;
+
+            return View();
         }
-
 
         // =======================================================================
         // Add items
@@ -78,6 +89,14 @@ namespace ASPNET_core_web_app_MVC.Controllers
         [HttpGet("additems")]
         public IActionResult AddItems()
         {
+            List<string> allTypes = new List<string>();
+            allTypes = ReadTypesJSON();
+            ViewBag.Types = allTypes;
+
+            List<string> allCommunes = new List<string>();
+            allCommunes = ReadCommunesJSON();
+            ViewBag.Communes = allCommunes;
+
             return View();
         }
 
@@ -105,7 +124,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
             WriteItemJSON(item);
 
-            return RedirectToAction("items");
+            return RedirectToAction("items", new { filter="", sort= "Date", direction="ASC"});
         }
 
 
@@ -116,7 +135,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         public IActionResult EditItems(int itemId, [FromForm] Item item)
         {
             EditItemByItemId(itemId, item);
-            return RedirectToAction("items");
+            return RedirectToAction("items", new { filter = "", sort = "Date", direction = "ASC" });
         }
 
 
@@ -127,7 +146,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         public IActionResult DeleteItems(int itemId)
         {
             DeleteItemByItemId(itemId);
-            return RedirectToAction("items");
+            return RedirectToAction("items", new { filter = "", sort = "Date", direction = "ASC" });
         }
 
 
@@ -278,6 +297,50 @@ namespace ASPNET_core_web_app_MVC.Controllers
          */
 
 
+
+        // =======================================================================
+        // Items JSON File : read all items from JSON file
+        // =======================================================================
+        List<string> ReadTypesJSON()
+        {
+            string UriJSON = $@"{Directory.GetCurrentDirectory()}/Data/Types.json";
+            List<string> myList = new List<string>();
+
+            var JSONFile = JObject.Parse(System.IO.File.ReadAllText(UriJSON));
+            var JSONQuery = from items in JSONFile["Types"]
+                            orderby items["Name"] ascending
+                            select items;
+
+            foreach (var item in JSONQuery)
+            {
+                myList.Add(item.ToObject<Models.ModelDataType>().Name);
+            }
+
+            return myList;
+        }
+
+        // =======================================================================
+        // Items JSON File : read all items from JSON file
+        // =======================================================================
+        List<string> ReadCommunesJSON()
+        {
+            string UriJSON = $@"{Directory.GetCurrentDirectory()}/Data/Communes.json";
+            List<string> myList = new List<string>();
+
+            var JSONFile = JObject.Parse(System.IO.File.ReadAllText(UriJSON));
+            var JSONQuery = from items in JSONFile["Communes"]
+                            orderby items["Name"] ascending
+                            select items;
+
+            foreach (var item in JSONQuery)
+            {
+                myList.Add(item.ToObject<Models.ModelDataCommune>().Name);
+            }
+
+            return myList;
+        }
+
+
         // =======================================================================
         // Items find : find item by item id
         // =======================================================================
@@ -356,7 +419,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         // Items JSON File : read ONLY user's items from JSON file
         // =======================================================================
-        List<Item> ReadUserItemsJSON(string sort, string direction)
+        List<Item> ReadUserItemsJSON(string filter, string sort, string direction)
         {
             List<Item> allItems = new List<Item>();
 
@@ -366,7 +429,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
             var propertyInfo = typeof(Item);
 
-            if (direction.Equals("ASC"))
+            if (direction == "ASC")
             {
                 var itemsByUser = listItems.Where(items => items.UserId == Int32.Parse(currentId))
                     .OrderBy(x => propertyInfo.GetProperty(sort).GetValue(x, null));    // get property of Sort
@@ -377,10 +440,21 @@ namespace ASPNET_core_web_app_MVC.Controllers
                     allItems.Add(items);
                 }
             }
-            else if (direction.Equals("DSC"))
+            else if (direction == "DSC")
             {
                 var itemsByUser = listItems.Where(items => items.UserId == Int32.Parse(currentId))
                     .OrderByDescending(x => propertyInfo.GetProperty(sort).GetValue(x, null));
+
+                // Appel de la requête
+                foreach (var items in itemsByUser)
+                {
+                    allItems.Add(items);
+                }
+            }
+            else if (filter != null)
+            {
+                var itemsByUser = listItems.Where(items => items.UserId == Int32.Parse(currentId)
+                    && (items.Type == filter || items.Localisation == filter));
 
                 // Appel de la requête
                 foreach (var items in itemsByUser)

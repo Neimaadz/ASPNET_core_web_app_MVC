@@ -1,0 +1,19 @@
+﻿{
+  "Types": [
+    {
+      "Name": "Restaurant"
+    },
+    {
+      "Name": "Hotel"
+    },
+    {
+      "Name": "Randonnée"
+    },
+    {
+      "Name": "Bar"
+    },
+    {
+      "Name": "Boite de nuit"
+    }
+  ]
+}
