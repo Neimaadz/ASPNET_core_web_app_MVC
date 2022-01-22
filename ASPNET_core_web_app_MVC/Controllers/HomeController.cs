@@ -61,13 +61,13 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
         public IActionResult Items(List<Item> listItems)
         {
-            List<string> allTypes = new List<string>();
-            allTypes = ReadTypesJSON();
-            ViewBag.Types = allTypes;
+            List<string> listTypes = new List<string>();
+            listTypes = ReadTypesJSON();
+            ViewBag.Types = listTypes;
 
-            List<string> allCommunes = new List<string>();
-            allCommunes = ReadCommunesJSON();
-            ViewBag.Communes = allCommunes;
+            List<string> listCommunes = new List<string>();
+            listCommunes = ReadCommunesJSON();
+            ViewBag.Communes = listCommunes;
 
             return View("Items", listItems);
         }
@@ -82,18 +82,29 @@ namespace ASPNET_core_web_app_MVC.Controllers
         }
 
         // =======================================================================
+        // Search item
+        // =======================================================================
+        [HttpPost("searchitems")]
+        public IActionResult SearchItems([FromForm] string search)
+        {
+            List<Item> listItems = new List<Item>();
+            listItems = SearchUserItems(search);
+
+            return Items(listItems);
+        }
+
+        // =======================================================================
         // Add items
         // =======================================================================
         [HttpGet("additems")]
         public IActionResult AddItems()
         {
-            List<string> allTypes = new List<string>();
-            allTypes = ReadTypesJSON();
-            ViewBag.Types = allTypes;
+            List<string> listTypes = new List<string>();
+            listTypes = ReadTypesJSON();
+            ViewBag.Types = listTypes;
 
-            List<string> allCommunes = new List<string>();
-            allCommunes = ReadCommunesJSON();
-            ViewBag.Communes = allCommunes;
+            List<string> listCommunes = new List<string>();
+            listCommunes = ReadCommunesJSON();
 
             return View();
         }
@@ -124,7 +135,6 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
             return RedirectToAction("items", new { filter="", sort= "Date", direction="ASC"});
         }
-
 
         // =======================================================================
         // Edit item
@@ -281,12 +291,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
          * 
          * 
          * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
+         *              METHODS
          * 
          * 
          * 
@@ -295,16 +300,41 @@ namespace ASPNET_core_web_app_MVC.Controllers
          */
 
 
+
+        // =======================================================================
+        // Search User's Items
+        // =======================================================================
+        List<Item> SearchUserItems(string search)
+        {
+            List<Item> listSearchedItems = new List<Item>();
+
+            // Définir ma source de données
+            var listItems = ReadItemsJSON();
+            var currentId = User.FindFirstValue("id");  // get the user id from token
+
+            var myQuery = listItems.Where(items => items.UserId == Int32.Parse(currentId) &&
+                items.Name.ToLower().Contains(search.ToLower()));
+
+            // Appel de la requête
+            foreach (var item in myQuery)
+            {
+                listSearchedItems.Add(item);
+            }
+
+            return listSearchedItems;
+        }
+
+
         // =======================================================================
         // Find Item by itemId
         // =======================================================================
         Item FindItemByItemId(int itemId)
         {
             Item item = new Item();
-            List<Item> ListItems = ReadItemsJSON();
+            List<Item> listItems = ReadItemsJSON();
 
             // Utilisation du ForEach() au lieu de LinQ car qu'une seule unique ID
-            ListItems.ForEach(x => { if (x.ItemId.Equals(itemId)) item = x; });
+            listItems.ForEach(x => { if (x.ItemId.Equals(itemId)) item = x; });
             return item;
         }
 
@@ -314,7 +344,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         void EditItemByItemId(int itemId, Item item)
         {
-            List<Item> Items = ReadItemsJSON();
+            List<Item> Items = ReadItemsJSON(); // name is important to write with this specific name in JSON
 
             // Utilisation du ForEach() au lieu de LinQ car qu'une seule unique ID
             Items.ForEach(x => {
@@ -326,6 +356,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
                     x.Description = item.Description;
                 }
             });
+
             var allItems = new { Items };   // Permet d'ajouter la propriété "Items" dans JSON
 
             string json = JsonConvert.SerializeObject(allItems, Formatting.Indented);
@@ -340,11 +371,12 @@ namespace ASPNET_core_web_app_MVC.Controllers
         void DeleteItemByItemId(int itemId)
         {
             int index = 0;
-            List<Item> Items = ReadItemsJSON();
+            List<Item> Items = ReadItemsJSON(); // name is important to write with this specific name in JSON
 
             // Utilisation du ForEach() au lieu de LinQ car qu'une seule unique ID
             Items.ForEach(x => { if (x.ItemId.Equals(itemId)) index=Items.IndexOf(x); });
             Items.RemoveAt(index);
+
             var allItems = new { Items };   // Permet d'ajouter la propriété "Items" dans JSON
 
             string json = JsonConvert.SerializeObject(allItems, Formatting.Indented);
@@ -359,21 +391,21 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         List<Item> ReadUserItems()
         {
-            List<Item> allItems = new List<Item>();
+            List<Item> listUserItems = new List<Item>();
 
             // Définir ma source de données
             var listItems = ReadItemsJSON();
             var currentId = User.FindFirstValue("id");  // get the user id from token
 
-            var itemsByUser = listItems.Where(items => items.UserId == Int32.Parse(currentId));
+            var myQuery = listItems.Where(items => items.UserId == Int32.Parse(currentId));
 
             // Appel de la requête
-            foreach (var items in itemsByUser)
+            foreach (var item in myQuery)
             {
-                allItems.Add(items);
+                listUserItems.Add(item);
             }
 
-            return allItems;
+            return listUserItems;
         }
 
 
@@ -382,7 +414,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         List<Item> SortUserItems(string filter, string sort, string direction)
         {
-            List<Item> allItems = new List<Item>();
+            List<Item> listSortedItems = new List<Item>();
 
             // Définir ma source de données
             var listItems = ReadItemsJSON();
@@ -392,39 +424,39 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
             if (direction == "ASC")
             {
-                var itemsByUser = listItems.Where(items => items.UserId == Int32.Parse(currentId))
+                var myQuery = listItems.Where(items => items.UserId == Int32.Parse(currentId))
                     .OrderBy(x => propertyInfo.GetProperty(sort).GetValue(x, null));    // get property of Sort
 
                 // Appel de la requête
-                foreach (var items in itemsByUser)
+                foreach (var item in myQuery)
                 {
-                    allItems.Add(items);
+                    listSortedItems.Add(item);
                 }
             }
             else if (direction == "DSC")
             {
-                var itemsByUser = listItems.Where(items => items.UserId == Int32.Parse(currentId))
+                var myQuery = listItems.Where(items => items.UserId == Int32.Parse(currentId))
                     .OrderByDescending(x => propertyInfo.GetProperty(sort).GetValue(x, null));
 
                 // Appel de la requête
-                foreach (var items in itemsByUser)
+                foreach (var item in myQuery)
                 {
-                    allItems.Add(items);
+                    listSortedItems.Add(item);
                 }
             }
             else if (filter != null)
             {
-                var itemsByUser = listItems.Where(items => items.UserId == Int32.Parse(currentId)
+                var myQuery = listItems.Where(items => items.UserId == Int32.Parse(currentId)
                     && (items.Type == filter || items.Localisation == filter));
 
                 // Appel de la requête
-                foreach (var items in itemsByUser)
+                foreach (var item in myQuery)
                 {
-                    allItems.Add(items);
+                    listSortedItems.Add(item);
                 }
             }
 
-            return allItems;
+            return listSortedItems;
         }
 
 
@@ -450,18 +482,18 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         List<Item> ReadItemsJSON()
         {
-            List<Item> allItems = new List<Item>();
+            List<Item> listItems = new List<Item>();
 
             var JSONFile = JObject.Parse(System.IO.File.ReadAllText(UriItemsJSON));
-            var JSONItems = from items in JSONFile["Items"]
+            var myQuery = from items in JSONFile["Items"]
                             select items;
 
-            foreach (var item in JSONItems)
+            foreach (var item in myQuery)
             {
-                allItems.Add(item.ToObject<Item>());
+                listItems.Add(item.ToObject<Item>());
             }
 
-            return allItems;
+            return listItems;
         }
 
 
@@ -470,10 +502,10 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         List<User> ReadUsersXML()
         {
-            List<User> allUsers = new List<User>();
+            List<User> listUsers = new List<User>();
 
             var XMLFile = XElement.Load(UriUserXML);
-            var XMLUsers = from element in XMLFile.Descendants("User")
+            var myQuery = from element in XMLFile.Descendants("User")
                            select new User()
                            {
                                Id = Convert.ToInt32(element.Element("Id").Value),
@@ -481,12 +513,12 @@ namespace ASPNET_core_web_app_MVC.Controllers
                                Password = element.Element("Password").Value,
                            };
 
-            foreach (var user in XMLUsers)
+            foreach (var user in myQuery)
             {
-                allUsers.Add(user);
+                listUsers.Add(user);
             }
 
-            return allUsers;
+            return listUsers;
         }
 
 
@@ -495,8 +527,8 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         void WriteUserXML(User user)
         {
-            List<User> ListUsers = ReadUsersXML();
-            int userId = ListUsers.Max(user => user.Id);    // find the highest id
+            List<User> listUsers = ReadUsersXML();
+            int userId = listUsers.Max(user => user.Id);    // find the highest id
 
             XDocument XMLFile = XDocument.Load(UriUserXML);
 
@@ -506,49 +538,6 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 .AddAfterSelf(new XElement("User", new XElement("Id", userId + 1), new XElement("Username", user.Username), new XElement("Password", user.Password)));
 
             XMLFile.Save(UriUserXML);
-        }
-
-
-        // =======================================================================
-        // Read all items property Type from JSON file
-        // =======================================================================
-        List<string> ReadTypesJSON()
-        {
-            string UriJSON = $@"{Directory.GetCurrentDirectory()}/Data/Types.json";
-            List<string> myList = new List<string>();
-
-            var JSONFile = JObject.Parse(System.IO.File.ReadAllText(UriJSON));
-            var JSONQuery = from items in JSONFile["Types"]
-                            orderby items["Name"] ascending
-                            select items;
-
-            foreach (var item in JSONQuery)
-            {
-                myList.Add(item.ToObject<Models.ModelDataType>().Name);
-            }
-
-            return myList;
-        }
-
-        // =======================================================================
-        // Read all items property Commune from JSON file
-        // =======================================================================
-        List<string> ReadCommunesJSON()
-        {
-            string UriJSON = $@"{Directory.GetCurrentDirectory()}/Data/Communes.json";
-            List<string> myList = new List<string>();
-
-            var JSONFile = JObject.Parse(System.IO.File.ReadAllText(UriJSON));
-            var JSONQuery = from items in JSONFile["Communes"]
-                            orderby items["Name"] ascending
-                            select items;
-
-            foreach (var item in JSONQuery)
-            {
-                myList.Add(item.ToObject<Models.ModelDataCommune>().Name);
-            }
-
-            return myList;
         }
 
 
@@ -565,6 +554,65 @@ namespace ASPNET_core_web_app_MVC.Controllers
             }
 
             return false;
+        }
+
+
+
+        /*
+         * 
+         * 
+         * 
+         * 
+         *                  STATIC METHODS
+         * 
+         * 
+         * 
+         * 
+         * 
+         * 
+         */
+
+
+        // =======================================================================
+        // Read all items property Type from JSON file
+        // =======================================================================
+        public static List<string> ReadTypesJSON()
+        {
+            string UriJSON = $@"{Directory.GetCurrentDirectory()}/Data/Types.json";
+            List<string> listTypes = new List<string>();
+
+            var JSONFile = JObject.Parse(System.IO.File.ReadAllText(UriJSON));
+            var myQuery = from types in JSONFile["Types"]
+                            orderby types["Name"] ascending
+                            select types;
+
+            foreach (var type in myQuery)
+            {
+                listTypes.Add(type.ToObject<Models.ModelDataType>().Name);
+            }
+
+            return listTypes;
+        }
+
+        // =======================================================================
+        // Read all items property Commune from JSON file
+        // =======================================================================
+        public static List<string> ReadCommunesJSON()
+        {
+            string UriJSON = $@"{Directory.GetCurrentDirectory()}/Data/Communes.json";
+            List<string> listCommunes = new List<string>();
+
+            var JSONFile = JObject.Parse(System.IO.File.ReadAllText(UriJSON));
+            var myQuery = from communes in JSONFile["Communes"]
+                            orderby communes["Name"] ascending
+                            select communes;
+
+            foreach (var commune in myQuery)
+            {
+                listCommunes.Add(commune.ToObject<Models.ModelDataCommune>().Name);
+            }
+
+            return listCommunes;
         }
 
 
