@@ -105,6 +105,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
             List<string> listCommunes = new List<string>();
             listCommunes = ReadCommunesJSON();
+            ViewBag.Communes = listCommunes;
 
             return View();
         }

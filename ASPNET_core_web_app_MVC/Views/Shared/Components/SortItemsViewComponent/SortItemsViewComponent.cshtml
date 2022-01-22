@@ -4,89 +4,93 @@
     <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
 
 
-        <div class="input-group mr-5">
-            <input type="text"
-                   class="form-control"
-                   placeholder="Search..."
-                   aria-label="Search"
-                   aria-describedby="btnGroupAddon"
-                   style="width:350px">
-            <button type="button" class="btn btn-outline-secondary">Search</button>
-        </div>
+        @using (Html.BeginForm("SearchItems", "Home", FormMethod.Post))
+        {
+            <div class="input-group mr-5">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Search..."
+                       aria-label="Search"
+                       aria-describedby="btnGroupAddon"
+                       name="search"
+                       style="width:350px">
+                <button type="submit" class="btn btn-outline-secondary">Search</button>
+            </div>
+        }
 
         @*
         *****************************************************************************************************************************
         *******************                              Sort                                                     *******************
         *****************************************************************************************************************************
         *@
-    <div class="btn-group me-2 ml-5" role="group" aria-label="First group">
-        <div class="dropdown mx-1">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Sort
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                @using (Html.BeginForm("SortItems", "Home", new { sort = "Name", direction = "ASC" }, FormMethod.Get))
-                {
-                    <button type="submit" class="dropdown-item btn btn-outline-secondary">Name (A to Z)</button>
-                }
-                @using (Html.BeginForm("SortItems", "Home", new { sort = "Name", direction = "DSC" }, FormMethod.Get))
-                {
-                    <button type="submit" class="dropdown-item btn btn-outline-secondary">Name (Z to A)</button>
-                }
-                @using (Html.BeginForm("SortItems", "Home", new { sort = "Date", direction = "DSC" }, FormMethod.Get))
-                {
-                    <button type="submit" class="dropdown-item btn btn-outline-secondary">Lastest</button>
-                }
-                @using (Html.BeginForm("SortItems", "Home", new { sort = "Date", direction = "ASC" }, FormMethod.Get))
-                {
-                    <button type="submit" class="dropdown-item btn btn-outline-secondary">Older</button>
-                }
-            </div>
-        </div>
-
-        @*
-        *****************************************************************************************************************************
-        *******************                              Filter : Type                                            *******************
-        *****************************************************************************************************************************
-        *@
-
-        <div class="dropdown mx-1">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Type
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="max-height: 200px; overflow-y: auto;">
-                @foreach (var type in ViewBag.Types)
-                {
-                    @using (Html.BeginForm("SortItems", "Home", new { filter = @type }, FormMethod.Get))
+        <div class="btn-group me-2 ml-5" role="group" aria-label="First group">
+            <div class="dropdown mx-1">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Sort
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    @using (Html.BeginForm("SortItems", "Home", new { sort = "Name", direction = "ASC" }, FormMethod.Get))
                     {
-                        <button type="submit" class="dropdown-item btn btn-outline-secondary">@type</button>
+                        <button type="submit" class="dropdown-item btn btn-outline-secondary">Name (A to Z)</button>
                     }
-                }
-            </div>
-        </div>
-
-        @*
-        *****************************************************************************************************************************
-        *******************                              Filter : Localistion                                     *******************
-        *****************************************************************************************************************************
-        *@
-
-        <div class="dropdown mx-1">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Localisation
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="max-height: 200px; overflow-y: auto;">
-                @foreach (var commune in ViewBag.Communes)
-                {
-                    @using (Html.BeginForm("SortItems", "Home", new { filter = @commune }, FormMethod.Get))
+                    @using (Html.BeginForm("SortItems", "Home", new { sort = "Name", direction = "DSC" }, FormMethod.Get))
                     {
-                        <button type="submit" class="dropdown-item btn btn-outline-secondary">@commune</button>
+                        <button type="submit" class="dropdown-item btn btn-outline-secondary">Name (Z to A)</button>
                     }
-                }
+                    @using (Html.BeginForm("SortItems", "Home", new { sort = "Date", direction = "DSC" }, FormMethod.Get))
+                    {
+                        <button type="submit" class="dropdown-item btn btn-outline-secondary">Lastest</button>
+                    }
+                    @using (Html.BeginForm("SortItems", "Home", new { sort = "Date", direction = "ASC" }, FormMethod.Get))
+                    {
+                        <button type="submit" class="dropdown-item btn btn-outline-secondary">Older</button>
+                    }
+                </div>
             </div>
+
+            @*
+            *****************************************************************************************************************************
+            *******************                              Filter : Type                                            *******************
+            *****************************************************************************************************************************
+            *@
+
+            <div class="dropdown mx-1">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Type
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="max-height: 200px; overflow-y: auto;">
+                    @foreach (var type in ViewBag.Types)
+                    {
+                        @using (Html.BeginForm("SortItems", "Home", new { filter = @type }, FormMethod.Get))
+                        {
+                            <button type="submit" class="dropdown-item btn btn-outline-secondary">@type</button>
+                        }
+                    }
+                </div>
+            </div>
+
+            @*
+            *****************************************************************************************************************************
+            *******************                              Filter : Localistion                                     *******************
+            *****************************************************************************************************************************
+            *@
+
+            <div class="dropdown mx-1">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Localisation
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="max-height: 200px; overflow-y: auto;">
+                    @foreach (var commune in ViewBag.Communes)
+                    {
+                        @using (Html.BeginForm("SortItems", "Home", new { filter = @commune }, FormMethod.Get))
+                        {
+                            <button type="submit" class="dropdown-item btn btn-outline-secondary">@commune</button>
+                        }
+                    }
+                </div>
+            </div>
+
+
         </div>
-
-
-    </div>
     </div>
 </div>

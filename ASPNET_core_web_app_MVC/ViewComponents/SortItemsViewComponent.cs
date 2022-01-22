@@ -14,13 +14,13 @@ namespace ASPNET_core_web_app_MVC.ViewComponents
     {
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            List<string> allTypes = new List<string>();
-            allTypes = HomeController.ReadTypesJSON();
-            ViewBag.Types = allTypes;
+            List<string> listTypes = new List<string>();
+            listTypes = HomeController.ReadTypesJSON();
+            ViewBag.Types = listTypes;
 
-            List<string> allCommunes = new List<string>();
-            allCommunes = HomeController.ReadCommunesJSON();
-            ViewBag.Communes = allCommunes;
+            List<string> listCommunes = new List<string>();
+            listCommunes = HomeController.ReadCommunesJSON();
+            ViewBag.Communes = listCommunes;
 
             return View("SortItemsViewComponent");
         }
