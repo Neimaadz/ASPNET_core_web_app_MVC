@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Security.Claims;
 using System.Xml.Linq;
 using ASPNET_core_web_app_MVC.Authentication;
@@ -11,7 +10,6 @@ using ASPNET_core_web_app_MVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -53,24 +51,15 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // All items
         // =======================================================================
         [HttpGet("items")]
-        [HttpGet("items/{filter=null}+{sort=null}+{direction=null}")]
-        public IActionResult Items(string filter, string sort, string direction)
+        public IActionResult Items()
         {
-            List<string> allTypes = new List<string>();
-            allTypes = ReadTypesJSON();
-            ViewBag.Types = allTypes;
+            List<Item> listItems = new List<Item>();
+            listItems = ReadUserItems(); // read only user's items
 
-            List<string> allCommunes = new List<string>();
-            allCommunes = ReadCommunesJSON();
-            ViewBag.Communes = allCommunes;
-
-            List<Item> allItems = new List<Item>();
-            allItems = ReadUserItemsJSON(filter, sort, direction); // read only user's items
-
-            return View(allItems);
+            return Items(listItems);
         }
 
-        public IActionResult SortItemsLayout()
+        public IActionResult Items(List<Item> listItems)
         {
             List<string> allTypes = new List<string>();
             allTypes = ReadTypesJSON();
@@ -80,7 +69,16 @@ namespace ASPNET_core_web_app_MVC.Controllers
             allCommunes = ReadCommunesJSON();
             ViewBag.Communes = allCommunes;
 
-            return View();
+            return View("Items", listItems);
+        }
+
+        [HttpGet("items/{filter=null}+{sort=null}+{direction=null}")]
+        public IActionResult SortItems(string filter, string sort, string direction)
+        {
+            List<Item> listItems = new List<Item>();
+            listItems = SortUserItems(filter, sort, direction);
+
+            return Items(listItems);
         }
 
         // =======================================================================
@@ -297,52 +295,8 @@ namespace ASPNET_core_web_app_MVC.Controllers
          */
 
 
-
         // =======================================================================
-        // Items JSON File : read all items from JSON file
-        // =======================================================================
-        List<string> ReadTypesJSON()
-        {
-            string UriJSON = $@"{Directory.GetCurrentDirectory()}/Data/Types.json";
-            List<string> myList = new List<string>();
-
-            var JSONFile = JObject.Parse(System.IO.File.ReadAllText(UriJSON));
-            var JSONQuery = from items in JSONFile["Types"]
-                            orderby items["Name"] ascending
-                            select items;
-
-            foreach (var item in JSONQuery)
-            {
-                myList.Add(item.ToObject<Models.ModelDataType>().Name);
-            }
-
-            return myList;
-        }
-
-        // =======================================================================
-        // Items JSON File : read all items from JSON file
-        // =======================================================================
-        List<string> ReadCommunesJSON()
-        {
-            string UriJSON = $@"{Directory.GetCurrentDirectory()}/Data/Communes.json";
-            List<string> myList = new List<string>();
-
-            var JSONFile = JObject.Parse(System.IO.File.ReadAllText(UriJSON));
-            var JSONQuery = from items in JSONFile["Communes"]
-                            orderby items["Name"] ascending
-                            select items;
-
-            foreach (var item in JSONQuery)
-            {
-                myList.Add(item.ToObject<Models.ModelDataCommune>().Name);
-            }
-
-            return myList;
-        }
-
-
-        // =======================================================================
-        // Items find : find item by item id
+        // Find Item by itemId
         // =======================================================================
         Item FindItemByItemId(int itemId)
         {
@@ -356,7 +310,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
 
         // =======================================================================
-        // Items edit : find item by item id
+        // Edit Item
         // =======================================================================
         void EditItemByItemId(int itemId, Item item)
         {
@@ -381,7 +335,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
 
         // =======================================================================
-        // Items delete : delete to JSON file
+        // Delete Item by itemId
         // =======================================================================
         void DeleteItemByItemId(int itemId)
         {
@@ -401,25 +355,32 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
 
         // =======================================================================
-        // Items JSON File : write to JSON file
+        // Read only User's items
         // =======================================================================
-        void WriteItemJSON(Item item)
+        List<Item> ReadUserItems()
         {
-            List<Item> Items = ReadItemsJSON(); // to add item into ALL items list
+            List<Item> allItems = new List<Item>();
 
-            Items.Add(item);
-            var allItems = new { Items };   // Permet d'ajouter la propriété "Items" dans JSON
+            // Définir ma source de données
+            var listItems = ReadItemsJSON();
+            var currentId = User.FindFirstValue("id");  // get the user id from token
 
-            string json = JsonConvert.SerializeObject(allItems, Formatting.Indented);
-            // Permet d'écrire sur le fichier new.json
-            System.IO.File.WriteAllText(UriItemsJSON, json);
+            var itemsByUser = listItems.Where(items => items.UserId == Int32.Parse(currentId));
 
+            // Appel de la requête
+            foreach (var items in itemsByUser)
+            {
+                allItems.Add(items);
+            }
+
+            return allItems;
         }
 
+
         // =======================================================================
-        // Items JSON File : read ONLY user's items from JSON file
+        // Sort only User's Items
         // =======================================================================
-        List<Item> ReadUserItemsJSON(string filter, string sort, string direction)
+        List<Item> SortUserItems(string filter, string sort, string direction)
         {
             List<Item> allItems = new List<Item>();
 
@@ -462,25 +423,30 @@ namespace ASPNET_core_web_app_MVC.Controllers
                     allItems.Add(items);
                 }
             }
-            // Default
-            else
-            {
-                var itemsByUser = listItems.Where(items => items.UserId == Int32.Parse(currentId))
-                    .OrderBy(x => propertyInfo.GetProperty("Date").GetValue(x, null));
-
-                // Appel de la requête
-                foreach (var items in itemsByUser)
-                {
-                    allItems.Add(items);
-                }
-            }
 
             return allItems;
         }
 
 
         // =======================================================================
-        // Items JSON File : read all items from JSON file
+        // Write Items into JSON File
+        // =======================================================================
+        void WriteItemJSON(Item item)
+        {
+            List<Item> Items = ReadItemsJSON(); // to add item into ALL items list
+
+            Items.Add(item);
+            var allItems = new { Items };   // Permet d'ajouter la propriété "Items" dans JSON
+
+            string json = JsonConvert.SerializeObject(allItems, Formatting.Indented);
+            // Permet d'écrire sur le fichier new.json
+            System.IO.File.WriteAllText(UriItemsJSON, json);
+
+        }
+
+
+        // =======================================================================
+        // Read All items from JSON File
         // =======================================================================
         List<Item> ReadItemsJSON()
         {
@@ -500,7 +466,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
 
         // =======================================================================
-        // Users XML File : read all users from XML file
+        // Read Users XML File : read all users from XML file
         // =======================================================================
         List<User> ReadUsersXML()
         {
@@ -525,7 +491,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
 
         // =======================================================================
-        // Users XML File : write to XML file
+        // Write Users XML File : write to XML file
         // =======================================================================
         void WriteUserXML(User user)
         {
@@ -540,6 +506,49 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 .AddAfterSelf(new XElement("User", new XElement("Id", userId + 1), new XElement("Username", user.Username), new XElement("Password", user.Password)));
 
             XMLFile.Save(UriUserXML);
+        }
+
+
+        // =======================================================================
+        // Read all items property Type from JSON file
+        // =======================================================================
+        List<string> ReadTypesJSON()
+        {
+            string UriJSON = $@"{Directory.GetCurrentDirectory()}/Data/Types.json";
+            List<string> myList = new List<string>();
+
+            var JSONFile = JObject.Parse(System.IO.File.ReadAllText(UriJSON));
+            var JSONQuery = from items in JSONFile["Types"]
+                            orderby items["Name"] ascending
+                            select items;
+
+            foreach (var item in JSONQuery)
+            {
+                myList.Add(item.ToObject<Models.ModelDataType>().Name);
+            }
+
+            return myList;
+        }
+
+        // =======================================================================
+        // Read all items property Commune from JSON file
+        // =======================================================================
+        List<string> ReadCommunesJSON()
+        {
+            string UriJSON = $@"{Directory.GetCurrentDirectory()}/Data/Communes.json";
+            List<string> myList = new List<string>();
+
+            var JSONFile = JObject.Parse(System.IO.File.ReadAllText(UriJSON));
+            var JSONQuery = from items in JSONFile["Communes"]
+                            orderby items["Name"] ascending
+                            select items;
+
+            foreach (var item in JSONQuery)
+            {
+                myList.Add(item.ToObject<Models.ModelDataCommune>().Name);
+            }
+
+            return myList;
         }
 
 

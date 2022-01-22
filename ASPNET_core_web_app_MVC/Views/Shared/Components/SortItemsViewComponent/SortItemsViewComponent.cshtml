@@ -25,19 +25,19 @@
                 Sort
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                @using (Html.BeginForm("Items", "Home", new { sort = "Name", direction = "ASC" }, FormMethod.Get))
+                @using (Html.BeginForm("SortItems", "Home", new { sort = "Name", direction = "ASC" }, FormMethod.Get))
                 {
                     <button type="submit" class="dropdown-item btn btn-outline-secondary">Name (A to Z)</button>
                 }
-                @using (Html.BeginForm("Items", "Home", new { sort = "Name", direction = "DSC" }, FormMethod.Get))
+                @using (Html.BeginForm("SortItems", "Home", new { sort = "Name", direction = "DSC" }, FormMethod.Get))
                 {
                     <button type="submit" class="dropdown-item btn btn-outline-secondary">Name (Z to A)</button>
                 }
-                @using (Html.BeginForm("Items", "Home", new { sort = "Date", direction = "DSC" }, FormMethod.Get))
+                @using (Html.BeginForm("SortItems", "Home", new { sort = "Date", direction = "DSC" }, FormMethod.Get))
                 {
                     <button type="submit" class="dropdown-item btn btn-outline-secondary">Lastest</button>
                 }
-                @using (Html.BeginForm("Items", "Home", new { sort = "Date", direction = "ASC" }, FormMethod.Get))
+                @using (Html.BeginForm("SortItems", "Home", new { sort = "Date", direction = "ASC" }, FormMethod.Get))
                 {
                     <button type="submit" class="dropdown-item btn btn-outline-secondary">Older</button>
                 }
@@ -57,7 +57,7 @@
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="max-height: 200px; overflow-y: auto;">
                 @foreach (var type in ViewBag.Types)
                 {
-                    @using (Html.BeginForm("Items", "Home", new { filter = @type }, FormMethod.Get))
+                    @using (Html.BeginForm("SortItems", "Home", new { filter = @type }, FormMethod.Get))
                     {
                         <button type="submit" class="dropdown-item btn btn-outline-secondary">@type</button>
                     }
@@ -78,7 +78,7 @@
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="max-height: 200px; overflow-y: auto;">
                 @foreach (var commune in ViewBag.Communes)
                 {
-                    @using (Html.BeginForm("Items", "Home", new { filter = @commune }, FormMethod.Get))
+                    @using (Html.BeginForm("SortItems", "Home", new { filter = @commune }, FormMethod.Get))
                     {
                         <button type="submit" class="dropdown-item btn btn-outline-secondary">@commune</button>
                     }

@@ -11,7 +11,7 @@
 </head>
 <body>
 
-    @Html.Partial("~/Views/Shared/SortItemsLayout.cshtml")
+    @await Component.InvokeAsync("SortItemsViewComponent")
 
     <table class="table table-striped">
         <thead>

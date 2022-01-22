@@ -1,26 +1,23 @@
 ﻿<Properties StartupConfiguration="{9E2357FA-60E0-4D99-A025-563FCD73B012}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="ASPNET_core_web_app_MVC/Controllers/HomeController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="ASPNET_core_web_app_MVC/ViewComponents/SortItemViewComponent.cs">
     <Files>
-      <File FileName="ASPNET_core_web_app_MVC/Controllers/HomeController.cs" Line="279" Column="1" />
-      <File FileName="ASPNET_core_web_app_MVC/Views/Home/Items.cshtml" Line="11" Column="8" />
-      <File FileName="ASPNET_core_web_app_MVC/Views/Shared/SortItemsLayout.cshtml" Line="28" Column="46" />
-      <File FileName="ASPNET_core_web_app_MVC/Models/DataTypes.cs" Line="4" Column="23" />
+      <File FileName="ASPNET_core_web_app_MVC/Controllers/HomeController.cs" Line="54" Column="60" />
+      <File FileName="ASPNET_core_web_app_MVC/Views/Home/Items.cshtml" Line="14" Column="59" />
+      <File FileName="ASPNET_core_web_app_MVC/Views/Shared/Components/SortItemsViewComponent/SortItemsViewComponent.cshtml" Line="45" Column="15" />
+      <File FileName="ASPNET_core_web_app_MVC/ViewComponents/SortItemViewComponent.cs" Line="11" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="ASPNET_core_web_app_MVC" expanded="True">
             <Node name="ASPNET_core_web_app_MVC" expanded="True">
-              <Node name="Authentication" expanded="True" />
-              <Node name="Controllers" expanded="True">
-                <Node name="HomeController.cs" selected="True" />
+              <Node name="ViewComponents" expanded="True">
+                <Node name="SortItemViewComponent.cs" selected="True" />
               </Node>
-              <Node name="Data" expanded="True" />
-              <Node name="Models" expanded="True" />
-              <Node name="Properties" expanded="True" />
               <Node name="Views" expanded="True">
-                <Node name="Home" expanded="True" />
-                <Node name="Shared" expanded="True" />
+                <Node name="Shared" expanded="True">
+                  <Node name="Components" expanded="True" />
+                </Node>
               </Node>
             </Node>
           </Node>
