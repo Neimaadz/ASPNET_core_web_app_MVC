@@ -72,6 +72,9 @@ namespace ASPNET_core_web_app_MVC.Controllers
             return View("Items", listItems);
         }
 
+        // =======================================================================
+        // Sort items
+        // =======================================================================
         [HttpGet("items/{filter=null}+{sort=null}+{direction=null}")]
         public IActionResult SortItems(string filter, string sort, string direction)
         {
@@ -82,7 +85,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         }
 
         // =======================================================================
-        // Search item
+        // Search items
         // =======================================================================
         [HttpPost("searchitems")]
         public IActionResult SearchItems([FromForm] string search)
