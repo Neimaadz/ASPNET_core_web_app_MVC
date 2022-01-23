@@ -114,6 +114,19 @@ namespace ASPNET_core_web_app_MVC.Controllers
             return Items(listItems);
         }
 
+        [HttpPost("items/ResetSearchItems")]
+        public IActionResult ResetSearchItems()
+        {
+            // delete argument stored in session
+            HttpContext.Session.Remove("search");
+            HttpContext.Session.Remove("type");
+            HttpContext.Session.Remove("localisation");
+            HttpContext.Session.Remove("sort");
+            HttpContext.Session.Remove("direction");
+
+            return RedirectToAction("Items");
+        }
+
 
         // =======================================================================
         // Add items

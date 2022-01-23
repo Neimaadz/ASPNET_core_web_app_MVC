@@ -4,7 +4,7 @@
     <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
 
         @*
-            Use normal form instead of BeginForm, to pass value into route value by method Get
+        Use normal form instead of BeginForm, to pass value into route value by method Get
         *@
         <form asp-controller="Home" asp-action="SearchItems" method="get">
             <div class="input-group mr-5">
@@ -37,12 +37,16 @@
             </div>
         </form>
 
+        <form asp-controller="Home" asp-action="ResetSearchItems" method="post">
+            <button type="submit" class="btn btn-outline-dark ml-5">Reset</button>
+        </form>
+
         @*
         *****************************************************************************************************************************
         *******************                              Sort                                                     *******************
         *****************************************************************************************************************************
         *@
-        <div class="btn-group me-2 ml-5" role="group" aria-label="First group">
+        <div class="btn-group me-2 ml-4" role="group" aria-label="First group">
             <div class="dropdown mx-1">
                 @if (ViewBag.Sort != null)
                 {
