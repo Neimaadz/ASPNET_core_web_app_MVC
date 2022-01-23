@@ -88,7 +88,7 @@ namespace ASPNET_core_web_app_MVC
             app.UseStaticFiles();
             app.UseRouting();
 
-            app.UseSession();
+            app.UseSession();   // use session to store data
             app.UseAuthentication();
             app.UseAuthorization();
 

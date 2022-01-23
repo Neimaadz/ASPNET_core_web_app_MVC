@@ -314,6 +314,75 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
 
         // =======================================================================
+        // Sort only User's Items
+        // =======================================================================
+        List<Item> SortUserItems(string type, string localisation, string sort, string direction)
+        {
+            List<Item> listSortedItems = new List<Item>();
+
+            // Définir ma source de données
+            var listItems = ReadItemsJSON();
+            var currentId = User.FindFirstValue("id");  // get the user id from token
+            var query = listItems.Where(items => items.UserId == Int32.Parse(currentId));
+
+            // Appel de la requête
+            foreach (var item in query)
+            {
+                listSortedItems.Add(item);
+            }
+
+            var propertyInfo = typeof(Item);
+
+            // use PREVIOUS list to restrict area sort and filter
+            if (direction == "ASC")
+            {
+                var myQuery = listSortedItems.OrderBy(x => propertyInfo.GetProperty(sort).GetValue(x, null)); // get property of Sort;
+                listSortedItems = new List<Item>(); // clear the PREVIOUS list in order to add new params sort and filter elements
+
+                foreach (var item in myQuery.ToList())
+                {
+                    listSortedItems.Add(item);
+                }
+
+            }
+            if (direction == "DSC")
+            {
+                var myQuery = listSortedItems.OrderByDescending(x => propertyInfo.GetProperty(sort).GetValue(x, null));
+                listSortedItems = new List<Item>();
+
+                foreach (var item in myQuery.ToList())
+                {
+                    listSortedItems.Add(item);
+                }
+
+            }
+            if (type != "")
+            {
+                var myQuery = listSortedItems.Where(items => items.Type == type);
+                listSortedItems = new List<Item>();
+
+                foreach (var item in myQuery.ToList())
+                {
+                    listSortedItems.Add(item);
+                }
+
+            }
+            if (localisation != "")
+            {
+                var myQuery = listSortedItems.Where(items => items.Localisation == localisation);
+                listSortedItems = new List<Item>();
+
+                foreach (var item in myQuery.ToList())
+                {
+                    listSortedItems.Add(item);
+                }
+            }
+
+            return listSortedItems;
+        }
+
+
+        // =======================================================================
         // Search User's Items
         // =======================================================================
         List<Item> SearchUserItems(string search)
@@ -418,81 +487,6 @@ namespace ASPNET_core_web_app_MVC.Controllers
             }
 
             return listUserItems;
-        }
-
-
-        // =======================================================================
-        // Sort only User's Items
-        // =======================================================================
-        List<Item> SortUserItems(string type, string localisation, string sort, string direction)
-        {
-            List<Item> listSortedItems = new List<Item>();
-
-            // Définir ma source de données
-            var listItems = ReadItemsJSON();
-            var currentId = User.FindFirstValue("id");  // get the user id from token
-            var query = listItems.Where(items => items.UserId == Int32.Parse(currentId));
-
-            // Appel de la requête
-            foreach (var item in query)
-            {
-                listSortedItems.Add(item);
-            }
-
-            var propertyInfo = typeof(Item);
-
-            if (direction == "ASC")
-            {
-                var myQuery = listSortedItems.OrderBy(x => propertyInfo.GetProperty(sort).GetValue(x, null)); // get property of Sort;
-
-                listSortedItems = new List<Item>();
-
-                // Appel de la requête
-                foreach (var item in myQuery.ToList())
-                {
-                    listSortedItems.Add(item);
-                }
-
-            }
-            if (direction == "DSC")
-            {
-                var myQuery = listSortedItems.OrderByDescending(x => propertyInfo.GetProperty(sort).GetValue(x, null));
-
-                listSortedItems = new List<Item>();
-
-                foreach (var item in myQuery.ToList())
-                {
-                    listSortedItems.Add(item);
-                }
-
-            }
-            if (type != "")
-            {
-                var myQuery = listSortedItems.Where(items => items.Type == type);
-
-                listSortedItems = new List<Item>();
-
-                // Appel de la requête
-                foreach (var item in myQuery.ToList())
-                {
-                    listSortedItems.Add(item);
-                }
-
-            }
-            if (localisation != "")
-            {
-                var myQuery = listSortedItems.Where(items => items.Localisation == localisation);
-
-                listSortedItems = new List<Item>();
-
-                // Appel de la requête
-                foreach (var item in myQuery.ToList())
-                {
-                    listSortedItems.Add(item);
-                }
-            }
-
-            return listSortedItems;
         }
 
 
