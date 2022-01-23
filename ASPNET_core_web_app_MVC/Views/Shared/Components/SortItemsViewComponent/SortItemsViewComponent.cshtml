@@ -49,14 +49,14 @@
                         <input type="hidden" name="localisation" value="@ViewBag.FilterLocalisation">
                         <input type="hidden" name="sort" value="Date">
                         <input type="hidden" name="direction" value="ASC">
-                        <button type="submit" class="dropdown-item btn btn-outline-secondary">Lastest</button>
+                        <button type="submit" class="dropdown-item btn btn-outline-secondary">Older</button>
                     </form>
                     <form asp-controller="Home" asp-action="SortItems" method="get">
                         <input type="hidden" name="type" value="@ViewBag.FilterType">
                         <input type="hidden" name="localisation" value="@ViewBag.FilterLocalisation">
                         <input type="hidden" name="sort" value="Date">
                         <input type="hidden" name="direction" value="DSC">
-                        <button type="submit" class="dropdown-item btn btn-outline-secondary">Older</button>
+                        <button type="submit" class="dropdown-item btn btn-outline-secondary">Lastest</button>
                     </form>
                 </div>
             </div>
