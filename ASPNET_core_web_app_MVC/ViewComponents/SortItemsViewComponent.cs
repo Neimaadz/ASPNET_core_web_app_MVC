@@ -24,10 +24,10 @@ namespace ASPNET_core_web_app_MVC.ViewComponents
             ViewBag.Communes = listCommunes;
 
             // get arguments from session in purpose to post in view form
-            ViewBag.SessionType = HttpContext.Session.GetString("type");
-            ViewBag.SessionLocalisation = HttpContext.Session.GetString("localisation");
-            ViewBag.SessionSort = HttpContext.Session.GetString("sort");
-            ViewBag.SessionDirection = HttpContext.Session.GetString("direction");
+            ViewBag.FilterType = HttpContext.Session.GetString("type");
+            ViewBag.FilterLocalisation = HttpContext.Session.GetString("localisation");
+            ViewBag.Sort = HttpContext.Session.GetString("sort");
+            ViewBag.SortDirection = HttpContext.Session.GetString("direction");
 
             return View("SortItemsViewComponent");
         }

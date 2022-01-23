@@ -81,14 +81,26 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         // Sort items
         // =======================================================================
-        [HttpPost("items/sort")]
-        public IActionResult SortItems(string type = "", string localisation="", string sort="", string direction="")
+        [HttpGet("items/sort")]
+        public IActionResult SortItems(string type, string localisation, string sort, string direction)
         {
             // Store arguments into session in purpose to use in SortItemViewComponent
-            HttpContext.Session.SetString("type", type);
-            HttpContext.Session.SetString("localisation", localisation);
-            HttpContext.Session.SetString("sort", sort);
-            HttpContext.Session.SetString("direction", direction);
+            if (type != null)
+            {
+                HttpContext.Session.SetString("type", type);
+            }
+            if (localisation != null)
+            {
+                HttpContext.Session.SetString("localisation", localisation);
+            }
+            if (sort != null)
+            {
+                HttpContext.Session.SetString("sort", sort);
+            }
+            if (direction != null)
+            {
+                HttpContext.Session.SetString("direction", direction);
+            }
 
             List<Item> listItems = new List<Item>();
             listItems = SortUserItems(type, localisation, sort, direction);
@@ -375,7 +387,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 }
 
             }
-            if (type != "")
+            if (type != null)
             {
                 var myQuery = listSortedItems.Where(items => items.Type == type);
                 listSortedItems = new List<Item>();
@@ -386,7 +398,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 }
 
             }
-            if (localisation != "")
+            if (localisation != null)
             {
                 var myQuery = listSortedItems.Where(items => items.Localisation == localisation);
                 listSortedItems = new List<Item>();
