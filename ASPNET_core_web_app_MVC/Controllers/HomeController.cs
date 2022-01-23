@@ -81,7 +81,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         // Sort items
         // =======================================================================
-        [HttpPost("sortitems")]
+        [HttpPost("items/sort")]
         public IActionResult SortItems(string type = "", string localisation="", string sort="", string direction="")
         {
             // Store arguments into session in purpose to use in SortItemViewComponent
@@ -97,13 +97,14 @@ namespace ASPNET_core_web_app_MVC.Controllers
         }
 
         // =======================================================================
-        // Search items
+        // Search items : using <form> instead of @BeginForm() to pass value into
+        //                route value with method Get
         // =======================================================================
-        [HttpPost("searchitems")]
-        public IActionResult SearchItems([FromForm] string search)
+        [HttpGet("items/search")]
+        public IActionResult SearchItems(string name)
         {
             List<Item> listItems = new List<Item>();
-            listItems = SearchUserItems(search);
+            listItems = SearchUserItemsbyItemName(name);
 
             return Items(listItems);
         }
@@ -111,7 +112,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         // Add items
         // =======================================================================
-        [HttpGet("additems")]
+        [HttpGet("items/add")]
         public IActionResult AddItems()
         {
             List<string> listTypes = new List<string>();
@@ -125,7 +126,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
             return View();
         }
 
-        [HttpPost("additems")]  // define route : https://localhost:<port>/items
+        [HttpPost("items/add")]  // define route : https://localhost:<port>/items
         public IActionResult AddItems([FromForm] ItemCredential itemCredential)
         {
             List<Item> ListItems = ReadItemsJSON(); // to find the highest id in ALL items list
@@ -150,10 +151,11 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         // Edit item
         // =======================================================================
-        [HttpPost("editItems/{itemId}")]
+        [HttpPost("items/edit/{itemId}")]
         public IActionResult EditItems(int itemId, [FromForm] Item item)
         {
             Item itemtoEdit = FindItemByItemId(itemId);
+
             if (itemtoEdit.UserId == Int32.Parse(User.FindFirstValue("id")))
             {
                 EditItemByItemId(itemId, item);
@@ -169,10 +171,11 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         // Delete item
         // =======================================================================
-        [HttpPost("deleteItems/{itemId}")]
+        [HttpPost("items/delete/{itemId}")]
         public IActionResult DeleteItems(int itemId)
         {
             Item item = FindItemByItemId(itemId);
+
             if (item.UserId == Int32.Parse(User.FindFirstValue("id")))
             {
                 DeleteItemByItemId(itemId);
@@ -401,7 +404,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         // Search User's Items
         // =======================================================================
-        List<Item> SearchUserItems(string search)
+        List<Item> SearchUserItemsbyItemName(string name)
         {
             List<Item> listSearchedItems = new List<Item>();
 
@@ -410,7 +413,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
             var currentUserId = Int32.Parse(User.FindFirstValue("id"));  // get the user id from token
 
             var myQuery = listItems.Where(items => items.UserId == currentUserId &&
-                items.Name.ToLower().Contains(search.ToLower()));
+                items.Name.ToLower().Contains(name.ToLower()));
 
             // Appel de la requête
             foreach (var item in myQuery)

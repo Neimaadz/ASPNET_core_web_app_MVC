@@ -98,6 +98,15 @@
       "Type": "Hotel",
       "Localisation": "Saint-Joseph",
       "Description": "Hotel le Palm***** situé aux alentours de Grand-Anse"
+    },
+    {
+      "ItemId": 17,
+      "UserId": 2,
+      "Name": "Factory",
+      "Date": "23/01/2022 16:47",
+      "Type": "Bar",
+      "Localisation": "Saint-Pierre",
+      "Description": "Bar sur le front de mer"
     }
   ]
 }
