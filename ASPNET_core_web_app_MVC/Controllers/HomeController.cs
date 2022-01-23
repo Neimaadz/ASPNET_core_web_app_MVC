@@ -153,8 +153,16 @@ namespace ASPNET_core_web_app_MVC.Controllers
         [HttpPost("editItems/{itemId}")]
         public IActionResult EditItems(int itemId, [FromForm] Item item)
         {
-            EditItemByItemId(itemId, item);
-            return RedirectToAction("Items");
+            Item itemtoEdit = FindItemByItemId(itemId);
+            if (itemtoEdit.UserId == Int32.Parse(User.FindFirstValue("id")))
+            {
+                EditItemByItemId(itemId, item);
+                return RedirectToAction("Items");
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
 
@@ -164,8 +172,16 @@ namespace ASPNET_core_web_app_MVC.Controllers
         [HttpPost("deleteItems/{itemId}")]
         public IActionResult DeleteItems(int itemId)
         {
-            DeleteItemByItemId(itemId);
-            return RedirectToAction("Items");
+            Item item = FindItemByItemId(itemId);
+            if (item.UserId == Int32.Parse(User.FindFirstValue("id")))
+            {
+                DeleteItemByItemId(itemId);
+                return RedirectToAction("Items");
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
 
