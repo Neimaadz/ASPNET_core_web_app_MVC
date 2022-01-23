@@ -1,16 +1,16 @@
 ﻿<Properties StartupConfiguration="{9E2357FA-60E0-4D99-A025-563FCD73B012}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="ASPNET_core_web_app_MVC/Views/Shared/Components/SortItemsViewComponent/SortItemsViewComponent.cshtml">
+  <MonoDevelop.Ide.Workbench ActiveDocument="ASPNET_core_web_app_MVC/Views/Shared/_Layout.cshtml">
     <Files>
-      <File FileName="ASPNET_core_web_app_MVC/Controllers/HomeController.cs" Line="140" Column="14" />
-      <File FileName="ASPNET_core_web_app_MVC/Views/Home/Items.cshtml" Line="4" Column="87" />
-      <File FileName="ASPNET_core_web_app_MVC/Views/Shared/Components/SortItemsViewComponent/SortItemsViewComponent.cshtml" Line="80" Column="52" />
-      <File FileName="ASPNET_core_web_app_MVC/ViewComponents/SortItemsViewComponent.cs" Line="26" Column="74" />
+      <File FileName="ASPNET_core_web_app_MVC/Controllers/HomeController.cs" Line="165" Column="46" />
+      <File FileName="ASPNET_core_web_app_MVC/Startup.cs" Line="91" Column="30" />
+      <File FileName="ASPNET_core_web_app_MVC/Views/Shared/_Layout.cshtml" Line="47" Column="26" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="ASPNET_core_web_app_MVC" expanded="True">
             <Node name="ASPNET_core_web_app_MVC" expanded="True">
+              <Node name="Authentication" expanded="True" />
               <Node name="Controllers" expanded="True" />
               <Node name="Data" expanded="True" />
               <Node name="Models" expanded="True" />
@@ -19,10 +19,9 @@
                 <Node name="Home" expanded="True" />
                 <Node name="Shared" expanded="True">
                   <Node name="Components" expanded="True">
-                    <Node name="SortItemsViewComponent" expanded="True">
-                      <Node name="SortItemsViewComponent.cshtml" selected="True" />
-                    </Node>
+                    <Node name="SortItemsViewComponent" expanded="True" />
                   </Node>
+                  <Node name="_Layout.cshtml" selected="True" />
                 </Node>
               </Node>
             </Node>

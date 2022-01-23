@@ -4,10 +4,18 @@
     <Id>2</Id>
     <Username>test</Username>
     <Password>test</Password>
+    <Role>user</Role>
   </User>
   <User>
     <Id>3</Id>
     <Username>admin</Username>
     <Password>admin</Password>
+    <Role>admin</Role>
+  </User>
+  <User>
+    <Id>4</Id>
+    <Username>damien</Username>
+    <Password>damien</Password>
+    <Role>user</Role>
   </User>
 </Users>

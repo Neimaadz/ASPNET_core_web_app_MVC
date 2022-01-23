@@ -172,6 +172,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         // All users
         // =======================================================================
+        [Authorize(Roles = "admin")]    // use role to authorize
         [HttpGet("users")]
         public IActionResult Users()
         {
@@ -570,7 +571,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
             XMLFile.Element("Users")
                 .Elements("User")
                 .Where(item => Convert.ToInt32(item.Element("Id").Value) == userId).FirstOrDefault()
-                .AddAfterSelf(new XElement("User", new XElement("Id", userId + 1), new XElement("Username", user.Username), new XElement("Password", user.Password)));
+                .AddAfterSelf(new XElement("User", new XElement("Id", userId + 1), new XElement("Username", user.Username), new XElement("Password", user.Password), new XElement("Role", "user")));
 
             XMLFile.Save(UriUserXML);
         }

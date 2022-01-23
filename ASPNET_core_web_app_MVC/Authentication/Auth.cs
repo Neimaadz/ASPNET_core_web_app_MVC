@@ -35,7 +35,8 @@ namespace ASPNET_core_web_app_MVC.Authentication
                            {
                                Id = Convert.ToInt32(element.Element("Id").Value),
                                Username = element.Element("Username").Value,
-                               Password = element.Element("Password").Value
+                               Password = element.Element("Password").Value,
+                               Role = element.Element("Role").Value
                            };
 
             foreach (var user in XMLUsers)
@@ -43,6 +44,7 @@ namespace ASPNET_core_web_app_MVC.Authentication
                 CurrentUser.Id = user.Id;
                 CurrentUser.Username = user.Username;
                 CurrentUser.Password = user.Password;
+                CurrentUser.Role = user.Role;
             }
 
 
@@ -66,7 +68,8 @@ namespace ASPNET_core_web_app_MVC.Authentication
                         {
                             // Customing the token
                             new Claim("id", CurrentUser.Id.ToString()),
-                            new Claim("username", username)
+                            new Claim("username", username),
+                            new Claim(ClaimTypes.Role, CurrentUser.Role)    // add a role
                         }),
                     Expires = DateTime.UtcNow.AddMinutes(15),
                     SigningCredentials = new SigningCredentials(

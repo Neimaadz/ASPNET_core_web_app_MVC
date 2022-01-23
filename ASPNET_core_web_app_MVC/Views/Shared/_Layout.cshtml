@@ -2,6 +2,7 @@
 @{
     // get the token
     var accessCookie = Context.Request.Cookies["Authorization"];
+    var isAdmin = User.IsInRole("admin");
 }
 
 <!DOCTYPE html>
@@ -32,9 +33,12 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="AddItems">Add Items</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Users">All Users</a>
-                            </li>
+                            @if (isAdmin)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Users">All Users</a>
+                                </li>
+                            }
                         }
                         @if (accessCookie == null)
                         {

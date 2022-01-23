@@ -6,5 +6,6 @@ namespace ASPNET_core_web_app_MVC.Models
         public int Id { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+        public string Role { get; set; }
     }
 }

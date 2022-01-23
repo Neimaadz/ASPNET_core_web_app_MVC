@@ -86,9 +86,9 @@ namespace ASPNET_core_web_app_MVC
             });
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseSession();
             app.UseRouting();
 
+            app.UseSession();
             app.UseAuthentication();
             app.UseAuthorization();
 
