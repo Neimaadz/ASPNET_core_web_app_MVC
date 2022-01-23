@@ -161,7 +161,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         // Delete item
         // =======================================================================
-        [HttpPost("deleteItems")]
+        [HttpPost("deleteItems/{itemId}")]
         public IActionResult DeleteItems(int itemId)
         {
             DeleteItemByItemId(itemId);
@@ -322,8 +322,8 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
             // Définir ma source de données
             var listItems = ReadItemsJSON();
-            var currentId = User.FindFirstValue("id");  // get the user id from token
-            var query = listItems.Where(items => items.UserId == Int32.Parse(currentId));
+            var currentUserId = Int32.Parse(User.FindFirstValue("id"));  // get the user id from token
+            var query = listItems.Where(items => items.UserId == currentUserId);
 
             // Appel de la requête
             foreach (var item in query)
@@ -391,9 +391,9 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
             // Définir ma source de données
             var listItems = ReadItemsJSON();
-            var currentId = User.FindFirstValue("id");  // get the user id from token
+            var currentUserId = Int32.Parse(User.FindFirstValue("id"));  // get the user id from token
 
-            var myQuery = listItems.Where(items => items.UserId == Int32.Parse(currentId) &&
+            var myQuery = listItems.Where(items => items.UserId == currentUserId &&
                 items.Name.ToLower().Contains(search.ToLower()));
 
             // Appel de la requête
@@ -426,10 +426,11 @@ namespace ASPNET_core_web_app_MVC.Controllers
         void EditItemByItemId(int itemId, Item item)
         {
             List<Item> Items = ReadItemsJSON(); // name is important to write with this specific name in JSON
+            var currentUserId = Int32.Parse(User.FindFirstValue("id"));  // get the user id from token
 
             // Utilisation du ForEach() au lieu de LinQ car qu'une seule unique ID
             Items.ForEach(x => {
-                if (x.ItemId.Equals(itemId))
+                if (x.ItemId.Equals(itemId) && x.UserId.Equals(currentUserId))
                 {
                     x.Name = item.Name;
                     x.Type = item.Type;
@@ -453,9 +454,10 @@ namespace ASPNET_core_web_app_MVC.Controllers
         {
             int index = 0;
             List<Item> Items = ReadItemsJSON(); // name is important to write with this specific name in JSON
+            var currentUserId = Int32.Parse(User.FindFirstValue("id"));  // get the user id from token
 
             // Utilisation du ForEach() au lieu de LinQ car qu'une seule unique ID
-            Items.ForEach(x => { if (x.ItemId.Equals(itemId)) index=Items.IndexOf(x); });
+            Items.ForEach(x => { if (x.ItemId.Equals(itemId) && x.UserId.Equals(currentUserId)) index=Items.IndexOf(x); });
             Items.RemoveAt(index);
 
             var allItems = new { Items };   // Permet d'ajouter la propriété "Items" dans JSON
@@ -476,9 +478,9 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
             // Définir ma source de données
             var listItems = ReadItemsJSON();
-            var currentId = User.FindFirstValue("id");  // get the user id from token
+            var currentUserId = Int32.Parse(User.FindFirstValue("id"));  // get the user id from token
 
-            var myQuery = listItems.Where(items => items.UserId == Int32.Parse(currentId));
+            var myQuery = listItems.Where(items => items.UserId == currentUserId);
 
             // Appel de la requête
             foreach (var item in myQuery)
