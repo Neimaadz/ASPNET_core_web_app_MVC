@@ -24,6 +24,7 @@ namespace ASPNET_core_web_app_MVC.ViewComponents
             ViewBag.Communes = listCommunes;
 
             // get arguments from session in purpose to post in view form
+            ViewBag.Search = HttpContext.Session.GetString("search");
             ViewBag.FilterType = HttpContext.Session.GetString("type");
             ViewBag.FilterLocalisation = HttpContext.Session.GetString("localisation");
             ViewBag.Sort = HttpContext.Session.GetString("sort");

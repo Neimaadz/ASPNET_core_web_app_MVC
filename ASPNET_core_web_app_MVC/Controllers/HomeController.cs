@@ -54,6 +54,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         public IActionResult Items()
         {
             // delete argument stored in session
+            HttpContext.Session.Remove("search");
             HttpContext.Session.Remove("type");
             HttpContext.Session.Remove("localisation");
             HttpContext.Session.Remove("sort");
@@ -79,12 +80,17 @@ namespace ASPNET_core_web_app_MVC.Controllers
         }
 
         // =======================================================================
-        // Sort items
+        // Search items : using <form> instead of @BeginForm() to pass value into
+        //                route value with method Get
         // =======================================================================
-        [HttpGet("items/sort")]
-        public IActionResult SortItems(string type, string localisation, string sort, string direction)
+        [HttpGet("items/search")]
+        public IActionResult SearchItems(string search, string type, string localisation, string sort, string direction)
         {
             // Store arguments into session in purpose to use in SortItemViewComponent
+            if (search != null)
+            {
+                HttpContext.Session.SetString("search", search);
+            }
             if (type != null)
             {
                 HttpContext.Session.SetString("type", type);
@@ -103,23 +109,11 @@ namespace ASPNET_core_web_app_MVC.Controllers
             }
 
             List<Item> listItems = new List<Item>();
-            listItems = SortUserItems(type, localisation, sort, direction);
+            listItems = SearchUserItems(search, type, localisation, sort, direction);
 
             return Items(listItems);
         }
 
-        // =======================================================================
-        // Search items : using <form> instead of @BeginForm() to pass value into
-        //                route value with method Get
-        // =======================================================================
-        [HttpGet("items/search")]
-        public IActionResult SearchItems(string name)
-        {
-            List<Item> listItems = new List<Item>();
-            listItems = SearchUserItemsbyItemName(name);
-
-            return Items(listItems);
-        }
 
         // =======================================================================
         // Add items
@@ -345,11 +339,11 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
 
         // =======================================================================
-        // Sort only User's Items
+        // Search only User's Items
         // =======================================================================
-        List<Item> SortUserItems(string type, string localisation, string sort, string direction)
+        List<Item> SearchUserItems(string search, string type, string localisation, string sort, string direction)
         {
-            List<Item> listSortedItems = new List<Item>();
+            List<Item> listResultItems = new List<Item>();
 
             // Définir ma source de données
             var listItems = ReadItemsJSON();
@@ -359,7 +353,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
             // Appel de la requête
             foreach (var item in query)
             {
-                listSortedItems.Add(item);
+                listResultItems.Add(item);
             }
 
             var propertyInfo = typeof(Item);
@@ -367,73 +361,60 @@ namespace ASPNET_core_web_app_MVC.Controllers
             // use PREVIOUS list to restrict area sort and filter
             if (direction == "ASC")
             {
-                var myQuery = listSortedItems.OrderBy(x => propertyInfo.GetProperty(sort).GetValue(x, null)); // get property of Sort;
-                listSortedItems = new List<Item>(); // clear the PREVIOUS list in order to add new params sort and filter elements
+                var myQuery = listResultItems.OrderBy(x => propertyInfo.GetProperty(sort).GetValue(x, null)); // get property of Sort;
+                listResultItems = new List<Item>(); // clear the PREVIOUS list in order to add new params sort and filter elements
 
                 foreach (var item in myQuery.ToList())
                 {
-                    listSortedItems.Add(item);
+                    listResultItems.Add(item);
                 }
 
             }
             if (direction == "DSC")
             {
-                var myQuery = listSortedItems.OrderByDescending(x => propertyInfo.GetProperty(sort).GetValue(x, null));
-                listSortedItems = new List<Item>();
+                var myQuery = listResultItems.OrderByDescending(x => propertyInfo.GetProperty(sort).GetValue(x, null));
+                listResultItems = new List<Item>();
 
                 foreach (var item in myQuery.ToList())
                 {
-                    listSortedItems.Add(item);
+                    listResultItems.Add(item);
                 }
 
             }
             if (type != null)
             {
-                var myQuery = listSortedItems.Where(items => items.Type == type);
-                listSortedItems = new List<Item>();
+                var myQuery = listResultItems.Where(items => items.Type == type);
+                listResultItems = new List<Item>();
 
                 foreach (var item in myQuery.ToList())
                 {
-                    listSortedItems.Add(item);
+                    listResultItems.Add(item);
                 }
 
             }
             if (localisation != null)
             {
-                var myQuery = listSortedItems.Where(items => items.Localisation == localisation);
-                listSortedItems = new List<Item>();
+                var myQuery = listResultItems.Where(items => items.Localisation == localisation);
+                listResultItems = new List<Item>();
 
                 foreach (var item in myQuery.ToList())
                 {
-                    listSortedItems.Add(item);
+                    listResultItems.Add(item);
+                }
+            }
+            if (search != null)
+            {
+                var myQuery = listResultItems.Where(items => items.UserId == currentUserId &&
+                items.Name.ToLower().Contains(search.ToLower()));
+                listResultItems = new List<Item>();
+
+                foreach (var item in myQuery.ToList())
+                {
+                    listResultItems.Add(item);
                 }
             }
 
-            return listSortedItems;
-        }
-
-
-        // =======================================================================
-        // Search User's Items
-        // =======================================================================
-        List<Item> SearchUserItemsbyItemName(string name)
-        {
-            List<Item> listSearchedItems = new List<Item>();
-
-            // Définir ma source de données
-            var listItems = ReadItemsJSON();
-            var currentUserId = Int32.Parse(User.FindFirstValue("id"));  // get the user id from token
-
-            var myQuery = listItems.Where(items => items.UserId == currentUserId &&
-                items.Name.ToLower().Contains(name.ToLower()));
-
-            // Appel de la requête
-            foreach (var item in myQuery)
-            {
-                listSearchedItems.Add(item);
-            }
-
-            return listSearchedItems;
+            return listResultItems;
         }
 
 

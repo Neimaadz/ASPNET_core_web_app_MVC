@@ -13,8 +13,12 @@
                        placeholder="Search..."
                        aria-label="Search"
                        aria-describedby="btnGroupAddon"
-                       name="name"
+                       name="search"
                        style="width:350px">
+                <input type="hidden" name="type" value="@ViewBag.FilterType">
+                <input type="hidden" name="localisation" value="@ViewBag.FilterLocalisation">
+                <input type="hidden" name="sort" value="@ViewBag.Sort">
+                <input type="hidden" name="direction" value="@ViewBag.SortDirection">
                 <button type="submit" class="btn btn-outline-secondary">Search</button>
             </div>
         </form>
@@ -30,28 +34,32 @@
                     Sort
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <form asp-controller="Home" asp-action="SortItems" method="get">
+                    <form asp-controller="Home" asp-action="SearchItems" method="get">
+                        <input type="hidden" name="search" value="@ViewBag.Search">
                         <input type="hidden" name="type" value="@ViewBag.FilterType">
                         <input type="hidden" name="localisation" value="@ViewBag.FilterLocalisation">
                         <input type="hidden" name="sort" value="Name">
                         <input type="hidden" name="direction" value="ASC">
                         <button type="submit" class="dropdown-item btn btn-outline-secondary">Name (A to Z)</button>
                     </form>
-                    <form asp-controller="Home" asp-action="SortItems" method="get">
+                    <form asp-controller="Home" asp-action="SearchItems" method="get">
+                        <input type="hidden" name="search" value="@ViewBag.Search">
                         <input type="hidden" name="type" value="@ViewBag.FilterType">
                         <input type="hidden" name="localisation" value="@ViewBag.FilterLocalisation">
                         <input type="hidden" name="sort" value="Name">
                         <input type="hidden" name="direction" value="DSC">
                         <button type="submit" class="dropdown-item btn btn-outline-secondary">Name (Z to A)</button>
                     </form>
-                    <form asp-controller="Home" asp-action="SortItems" method="get">
+                    <form asp-controller="Home" asp-action="SearchItems" method="get">
+                        <input type="hidden" name="search" value="@ViewBag.Search">
                         <input type="hidden" name="type" value="@ViewBag.FilterType">
                         <input type="hidden" name="localisation" value="@ViewBag.FilterLocalisation">
                         <input type="hidden" name="sort" value="Date">
                         <input type="hidden" name="direction" value="ASC">
                         <button type="submit" class="dropdown-item btn btn-outline-secondary">Older</button>
                     </form>
-                    <form asp-controller="Home" asp-action="SortItems" method="get">
+                    <form asp-controller="Home" asp-action="SearchItems" method="get">
+                        <input type="hidden" name="search" value="@ViewBag.Search">
                         <input type="hidden" name="type" value="@ViewBag.FilterType">
                         <input type="hidden" name="localisation" value="@ViewBag.FilterLocalisation">
                         <input type="hidden" name="sort" value="Date">
@@ -74,13 +82,14 @@
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="max-height: 200px; overflow-y: auto;">
                     @foreach (var type in ViewBag.Types)
                     {
-                        <form asp-controller="Home" asp-action="SortItems" method="get">
-                            <input type="hidden" name="type" value="@type">
-                            <input type="hidden" name="localisation" value="@ViewBag.FilterLocalisation">
-                            <input type="hidden" name="sort" value="@ViewBag.Sort">
-                            <input type="hidden" name="direction" value="@ViewBag.SortDirection">
-                            <button type="submit" class="dropdown-item btn btn-outline-secondary">@type</button>
-                        </form>
+                    <form asp-controller="Home" asp-action="SearchItems" method="get">
+                        <input type="hidden" name="search" value="@ViewBag.Search">
+                        <input type="hidden" name="type" value="@type">
+                        <input type="hidden" name="localisation" value="@ViewBag.FilterLocalisation">
+                        <input type="hidden" name="sort" value="@ViewBag.Sort">
+                        <input type="hidden" name="direction" value="@ViewBag.SortDirection">
+                        <button type="submit" class="dropdown-item btn btn-outline-secondary">@type</button>
+                    </form>
                     }
                 </div>
             </div>
@@ -98,13 +107,14 @@
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="max-height: 200px; overflow-y: auto;">
                     @foreach (var commune in ViewBag.Communes)
                     {
-                        <form asp-controller="Home" asp-action="SortItems" method="get">
-                            <input type="hidden" name="type" value="@ViewBag.FilterType">
-                            <input type="hidden" name="localisation" value="@commune">
-                            <input type="hidden" name="sort" value="@ViewBag.Sort">
-                            <input type="hidden" name="direction" value="@ViewBag.SortDirection">
-                            <button type="submit" class="dropdown-item btn btn-outline-secondary">@commune</button>
-                        </form>
+                    <form asp-controller="Home" asp-action="SearchItems" method="get">
+                        <input type="hidden" name="search" value="@ViewBag.Search">
+                        <input type="hidden" name="type" value="@ViewBag.FilterType">
+                        <input type="hidden" name="localisation" value="@commune">
+                        <input type="hidden" name="sort" value="@ViewBag.Sort">
+                        <input type="hidden" name="direction" value="@ViewBag.SortDirection">
+                        <button type="submit" class="dropdown-item btn btn-outline-secondary">@commune</button>
+                    </form>
                     }
                 </div>
             </div>
