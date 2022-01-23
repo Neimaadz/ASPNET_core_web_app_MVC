@@ -80,6 +80,24 @@
       "Type": "Restaurant",
       "Localisation": "La Plaine des Cafres",
       "Description": "Saucisse"
+    },
+    {
+      "ItemId": 15,
+      "UserId": 2,
+      "Name": "Osaka",
+      "Date": "23/01/2022 14:18",
+      "Type": "Restaurant",
+      "Localisation": "Saint-Denis",
+      "Description": "Restaurant de japonais"
+    },
+    {
+      "ItemId": 16,
+      "UserId": 2,
+      "Name": "Hotel le Palm*****",
+      "Date": "23/01/2022 14:27",
+      "Type": "Hotel",
+      "Localisation": "Saint-Joseph",
+      "Description": "Hotel le Palm***** situé aux alentours de Grand-Anse"
     }
   ]
 }

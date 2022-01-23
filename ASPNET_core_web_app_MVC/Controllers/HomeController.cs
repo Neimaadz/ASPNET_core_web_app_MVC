@@ -53,6 +53,12 @@ namespace ASPNET_core_web_app_MVC.Controllers
         [HttpGet("items")]
         public IActionResult Items()
         {
+            // delete argument stored in session
+            HttpContext.Session.Remove("type");
+            HttpContext.Session.Remove("localisation");
+            HttpContext.Session.Remove("sort");
+            HttpContext.Session.Remove("direction");
+
             List<Item> listItems = new List<Item>();
             listItems = ReadUserItems(); // read only user's items
 
@@ -75,11 +81,17 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         // Sort items
         // =======================================================================
-        [HttpGet("items/{filter=null}+{sort=null}+{direction=null}")]
-        public IActionResult SortItems(string filter, string sort, string direction)
+        [HttpPost("sortitems")]
+        public IActionResult SortItems(string type = "", string localisation="", string sort="", string direction="")
         {
+            // Store arguments into session in purpose to use in SortItemViewComponent
+            HttpContext.Session.SetString("type", type);
+            HttpContext.Session.SetString("localisation", localisation);
+            HttpContext.Session.SetString("sort", sort);
+            HttpContext.Session.SetString("direction", direction);
+
             List<Item> listItems = new List<Item>();
-            listItems = SortUserItems(filter, sort, direction);
+            listItems = SortUserItems(type, localisation, sort, direction);
 
             return Items(listItems);
         }
@@ -118,26 +130,21 @@ namespace ASPNET_core_web_app_MVC.Controllers
         {
             List<Item> ListItems = ReadItemsJSON(); // to find the highest id in ALL items list
             int itemId = ListItems.Max(item => item.ItemId);    // find the highest id
-            string name = itemCredential.Name;
-            string date = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
-            string type = itemCredential.Type;
-            string localistion = itemCredential.Localisation;
-            string description = itemCredential.Description;
 
             Item item = new Item()
             {
                 ItemId = itemId + 1,
                 UserId = Int32.Parse(User.FindFirstValue("id")),
-                Name = name,
-                Date = date,
-                Type = type,
-                Localisation = localistion,
-                Description = description
+                Name = itemCredential.Name,
+                Date = DateTime.Now.ToString("dd/MM/yyyy HH:mm"),
+                Type = itemCredential.Type,
+                Localisation = itemCredential.Localisation,
+                Description = itemCredential.Description
             };
 
             WriteItemJSON(item);
 
-            return RedirectToAction("items", new { filter="", sort= "Date", direction="ASC"});
+            return RedirectToAction("Items");
         }
 
         // =======================================================================
@@ -147,7 +154,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         public IActionResult EditItems(int itemId, [FromForm] Item item)
         {
             EditItemByItemId(itemId, item);
-            return RedirectToAction("items", new { filter = "", sort = "Date", direction = "ASC" });
+            return RedirectToAction("Items");
         }
 
 
@@ -158,7 +165,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         public IActionResult DeleteItems(int itemId)
         {
             DeleteItemByItemId(itemId);
-            return RedirectToAction("items", new { filter = "", sort = "Date", direction = "ASC" });
+            return RedirectToAction("Items");
         }
 
 
@@ -416,45 +423,69 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         // Sort only User's Items
         // =======================================================================
-        List<Item> SortUserItems(string filter, string sort, string direction)
+        List<Item> SortUserItems(string type, string localisation, string sort, string direction)
         {
             List<Item> listSortedItems = new List<Item>();
 
             // Définir ma source de données
             var listItems = ReadItemsJSON();
             var currentId = User.FindFirstValue("id");  // get the user id from token
+            var query = listItems.Where(items => items.UserId == Int32.Parse(currentId));
+
+            // Appel de la requête
+            foreach (var item in query)
+            {
+                listSortedItems.Add(item);
+            }
 
             var propertyInfo = typeof(Item);
 
             if (direction == "ASC")
             {
-                var myQuery = listItems.Where(items => items.UserId == Int32.Parse(currentId))
-                    .OrderBy(x => propertyInfo.GetProperty(sort).GetValue(x, null));    // get property of Sort
+                var myQuery = listSortedItems.OrderBy(x => propertyInfo.GetProperty(sort).GetValue(x, null)); // get property of Sort;
+
+                listSortedItems = new List<Item>();
 
                 // Appel de la requête
-                foreach (var item in myQuery)
+                foreach (var item in myQuery.ToList())
                 {
                     listSortedItems.Add(item);
                 }
-            }
-            else if (direction == "DSC")
-            {
-                var myQuery = listItems.Where(items => items.UserId == Int32.Parse(currentId))
-                    .OrderByDescending(x => propertyInfo.GetProperty(sort).GetValue(x, null));
 
-                // Appel de la requête
-                foreach (var item in myQuery)
+            }
+            if (direction == "DSC")
+            {
+                var myQuery = listSortedItems.OrderByDescending(x => propertyInfo.GetProperty(sort).GetValue(x, null));
+
+                listSortedItems = new List<Item>();
+
+                foreach (var item in myQuery.ToList())
                 {
                     listSortedItems.Add(item);
                 }
+
             }
-            else if (filter != null)
+            if (type != "")
             {
-                var myQuery = listItems.Where(items => items.UserId == Int32.Parse(currentId)
-                    && (items.Type == filter || items.Localisation == filter));
+                var myQuery = listSortedItems.Where(items => items.Type == type);
+
+                listSortedItems = new List<Item>();
 
                 // Appel de la requête
-                foreach (var item in myQuery)
+                foreach (var item in myQuery.ToList())
+                {
+                    listSortedItems.Add(item);
+                }
+
+            }
+            if (localisation != "")
+            {
+                var myQuery = listSortedItems.Where(items => items.Localisation == localisation);
+
+                listSortedItems = new List<Item>();
+
+                // Appel de la requête
+                foreach (var item in myQuery.ToList())
                 {
                     listSortedItems.Add(item);
                 }

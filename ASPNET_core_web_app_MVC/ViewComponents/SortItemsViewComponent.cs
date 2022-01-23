@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using ASPNET_core_web_app_MVC.Controllers;
+using Microsoft.AspNetCore.Http;
 
 namespace ASPNET_core_web_app_MVC.ViewComponents
 {
@@ -21,6 +22,12 @@ namespace ASPNET_core_web_app_MVC.ViewComponents
             List<string> listCommunes = new List<string>();
             listCommunes = HomeController.ReadCommunesJSON();
             ViewBag.Communes = listCommunes;
+
+            // get arguments from session in purpose to post in view form
+            ViewBag.SessionType = HttpContext.Session.GetString("type");
+            ViewBag.SessionLocalisation = HttpContext.Session.GetString("localisation");
+            ViewBag.SessionSort = HttpContext.Session.GetString("sort");
+            ViewBag.SessionDirection = HttpContext.Session.GetString("direction");
 
             return View("SortItemsViewComponent");
         }

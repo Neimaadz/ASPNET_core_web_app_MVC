@@ -57,6 +57,7 @@ namespace ASPNET_core_web_app_MVC
             });
 
             services.AddSingleton<IJwtAuth>(new Auth(key));
+            services.AddSession();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -85,7 +86,7 @@ namespace ASPNET_core_web_app_MVC
             });
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            app.UseSession();
             app.UseRouting();
 
             app.UseAuthentication();
