@@ -471,6 +471,11 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 }
             });
 
+            // delete file associated to item
+            var myItem = FindItemByItemId(itemId);
+            string itemImagePath = Path.Combine(webHostEnvironment.WebRootPath, "images") + "/" + myItem.Image;
+            System.IO.File.Delete(itemImagePath);
+
             var allItems = new { Items };   // Permet d'ajouter la propriété "Items" dans JSON
 
             string json = JsonConvert.SerializeObject(allItems, Formatting.Indented);
