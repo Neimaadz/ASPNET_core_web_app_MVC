@@ -18,6 +18,7 @@
     <table class="table table-striped">
         <thead>
             <tr>
+                <th scope="col"></th>
                 <th scope="col">Name: </th>
                 <th scope="col">Ajouté le: </th>
                 <th scope="col">Type: </th>
@@ -31,6 +32,12 @@
             @foreach (var item in Model)
             {
                 <tr>
+                    <td>
+                        <img src="~/images/@item.Image"
+                             class="rounded-circle"
+                             height="40" width="40"
+                             asp-append-version="true" />
+                    </td>
                     <td>
                         @item.Name
                     </td>
@@ -47,7 +54,7 @@
                         @item.Description
                     </td>
                     <td style="display:inline-flex">
-                        @using (Html.BeginForm("EditItems", "Home", new { itemId = @item.ItemId }, FormMethod.Post))
+                        @using (Html.BeginForm("EditItems", "Home", new { itemId = @item.ItemId }, FormMethod.Post, null, new { enctype = "multipart/form-data" }))
                         {
                             var myEditModal = "myEditModal" + @item.ItemId;
 
@@ -86,13 +93,19 @@
                                                 <tr>
                                                     <td>Localisation: </td>
                                                     <td>
-                                                        @Html.DropDownListFor(m => @item.Localisation, new SelectList(ViewBag.Communes, @item.Localisation), "Localisation", new { required = "required" })
+                                                        @Html.DropDownListFor(m => @item.Localisation, new SelectList(ViewBag.Localisations, @item.Localisation), "Localisation", new { required = "required" })
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td>Description: </td>
                                                     <td>
                                                         @Html.TextAreaFor(m => @item.Description, new { maxlength = "100", rows = "3", cols = "40", @style = "resize: none;", required = "required" })
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Image: </td>
+                                                    <td>
+                                                        <input type="file" name="image">
                                                     </td>
                                                 </tr>
                                             </table>

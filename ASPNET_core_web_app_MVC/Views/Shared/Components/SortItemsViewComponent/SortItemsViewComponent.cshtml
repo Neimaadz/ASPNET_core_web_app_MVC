@@ -187,21 +187,21 @@
                     </button>
                 }
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="max-height: 200px; overflow-y: auto;">
-                    @foreach (var commune in ViewBag.Communes)
+                    @foreach (var localisation in ViewBag.Localisations)
                     {
                         <form asp-controller="Home" asp-action="SearchItems" method="get">
                             <input type="hidden" name="search" value="@ViewBag.Search">
                             <input type="hidden" name="type" value="@ViewBag.FilterType">
-                            <input type="hidden" name="localisation" value="@commune">
+                            <input type="hidden" name="localisation" value="@localisation">
                             <input type="hidden" name="sort" value="@ViewBag.Sort">
                             <input type="hidden" name="direction" value="@ViewBag.SortDirection">
-                            @if (ViewBag.FilterLocalisation == @commune)
+                            @if (ViewBag.FilterLocalisation == @localisation)
                             {
-                                <button type="submit" class="dropdown-item btn btn-outline-secondary bg-primary">@commune</button>
+                                <button type="submit" class="dropdown-item btn btn-outline-secondary bg-primary">@localisation</button>
                             }
                             else
                             {
-                                <button type="submit" class="dropdown-item btn btn-outline-secondary">@commune</button>
+                                <button type="submit" class="dropdown-item btn btn-outline-secondary">@localisation</button>
                             }
                         </form>
                     }

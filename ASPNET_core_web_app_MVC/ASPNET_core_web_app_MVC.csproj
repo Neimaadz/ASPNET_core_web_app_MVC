@@ -10,6 +10,7 @@
     <None Remove="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <None Remove="System.IdentityModel.Tokens.Jwt" />
     <None Remove="ViewComponents\" />
+    <None Remove="Views\Shared\Components\SortItemsViewComponent %28copie%29\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
@@ -19,5 +20,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ViewComponents\" />
+    <Folder Include="wwwroot\images\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="wwwroot\images\" />
   </ItemGroup>
 </Project>

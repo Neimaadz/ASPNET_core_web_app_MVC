@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using ASPNET_core_web_app_MVC.Authentication;
 using ASPNET_core_web_app_MVC.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -21,15 +22,17 @@ namespace ASPNET_core_web_app_MVC.Controllers
     public class HomeController : Controller
     {
         // private readonly ILogger<HomeController> _logger;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IJwtAuth jwtAuth;
         private string UriUserXML = $@"{Directory.GetCurrentDirectory()}/Data/Users.xml";
         private string UriItemsJSON = $@"{Directory.GetCurrentDirectory()}/Data/Items.json";
 
         // public HomeController(ILogger<HomeController> logger)
-        public HomeController(IJwtAuth jwtAuth)
+        public HomeController(IJwtAuth jwtAuth, IWebHostEnvironment hostEnvironment)
         {
             // _logger = logger;
             this.jwtAuth = jwtAuth;
+            webHostEnvironment = hostEnvironment;
         }
 
         [AllowAnonymous]
@@ -72,9 +75,9 @@ namespace ASPNET_core_web_app_MVC.Controllers
             listTypes = ReadTypesJSON();
             ViewBag.Types = listTypes;
 
-            List<string> listCommunes = new List<string>();
-            listCommunes = ReadCommunesJSON();
-            ViewBag.Communes = listCommunes;
+            List<string> listLocalisations = new List<string>();
+            listLocalisations = ReadLocalisationsJSON();
+            ViewBag.Localisations = listLocalisations;
 
             return View("Items", listItems);
         }
@@ -138,9 +141,9 @@ namespace ASPNET_core_web_app_MVC.Controllers
             listTypes = ReadTypesJSON();
             ViewBag.Types = listTypes;
 
-            List<string> listCommunes = new List<string>();
-            listCommunes = ReadCommunesJSON();
-            ViewBag.Communes = listCommunes;
+            List<string> listLocalisations = new List<string>();
+            listLocalisations = ReadLocalisationsJSON();
+            ViewBag.Localisations = listLocalisations;
 
             return View();
         }
@@ -150,6 +153,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         {
             List<Item> ListItems = ReadItemsJSON(); // to find the highest id in ALL items list
             int itemId = ListItems.Max(item => item.ItemId);    // find the highest id
+            string uniqueFileName = UploadedFile(itemCredential.Image);
 
             Item item = new Item()
             {
@@ -159,7 +163,8 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 Date = DateTime.Now.ToString("dd/MM/yyyy HH:mm"),
                 Type = itemCredential.Type,
                 Localisation = itemCredential.Localisation,
-                Description = itemCredential.Description
+                Description = itemCredential.Description,
+                Image = uniqueFileName,
             };
 
             WriteItemJSON(item);
@@ -171,13 +176,14 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // Edit item
         // =======================================================================
         [HttpPost("items/edit/{itemId}")]
-        public IActionResult EditItems(int itemId, [FromForm] Item item)
+        public IActionResult EditItems(int itemId, [FromForm] Item item, [FromForm] IFormFile image)
         {
             Item itemtoEdit = FindItemByItemId(itemId);
+            string uniqueFileName = UploadedFile(image);
 
             if (itemtoEdit.UserId == Int32.Parse(User.FindFirstValue("id")))
             {
-                EditItemByItemId(itemId, item);
+                EditItemByItemId(itemId, item, uniqueFileName);
                 return RedirectToAction("Items");
             }
             else
@@ -448,7 +454,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         // Edit Item
         // =======================================================================
-        void EditItemByItemId(int itemId, Item item)
+        void EditItemByItemId(int itemId, Item item, string image)
         {
             List<Item> Items = ReadItemsJSON(); // name is important to write with this specific name in JSON
             var currentUserId = Int32.Parse(User.FindFirstValue("id"));  // get the user id from token
@@ -461,6 +467,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
                     x.Type = item.Type;
                     x.Localisation = item.Localisation;
                     x.Description = item.Description;
+                    x.Image = image;
                 }
             });
 
@@ -484,6 +491,11 @@ namespace ASPNET_core_web_app_MVC.Controllers
             // Utilisation du ForEach() au lieu de LinQ car qu'une seule unique ID
             Items.ForEach(x => { if (x.ItemId.Equals(itemId) && x.UserId.Equals(currentUserId)) index=Items.IndexOf(x); });
             Items.RemoveAt(index);
+
+            // delete file associated to item
+            var item = FindItemByItemId(itemId);
+            string itemImagePath = Path.Combine(webHostEnvironment.WebRootPath, "images") + "/" + item.Image;
+            System.IO.File.Delete(itemImagePath);
 
             var allItems = new { Items };   // Permet d'ajouter la propriété "Items" dans JSON
 
@@ -613,6 +625,26 @@ namespace ASPNET_core_web_app_MVC.Controllers
             return false;
         }
 
+        // =======================================================================
+        // Upload file
+        // =======================================================================
+        string UploadedFile(IFormFile image)
+        {
+            string uniqueFileName = null;
+
+            if (image != null)
+            {
+                string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "images");
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + image.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    image.CopyTo(fileStream);
+                }
+            }
+            return uniqueFileName;
+        }
+
 
 
         /*
@@ -652,24 +684,24 @@ namespace ASPNET_core_web_app_MVC.Controllers
         }
 
         // =======================================================================
-        // Read all items property Commune from JSON file
+        // Read all items property Localisation from JSON file
         // =======================================================================
-        public static List<string> ReadCommunesJSON()
+        public static List<string> ReadLocalisationsJSON()
         {
-            string UriJSON = $@"{Directory.GetCurrentDirectory()}/Data/Communes.json";
-            List<string> listCommunes = new List<string>();
+            string UriJSON = $@"{Directory.GetCurrentDirectory()}/Data/Localisations.json";
+            List<string> listLocalisation = new List<string>();
 
             var JSONFile = JObject.Parse(System.IO.File.ReadAllText(UriJSON));
-            var myQuery = from communes in JSONFile["Communes"]
-                            orderby communes["Name"] ascending
-                            select communes;
+            var myQuery = from localisation in JSONFile["Localisations"]
+                            orderby localisation["Name"] ascending
+                            select localisation;
 
-            foreach (var commune in myQuery)
+            foreach (var localisation in myQuery)
             {
-                listCommunes.Add(commune.ToObject<Models.ModelDataCommune>().Name);
+                listLocalisation.Add(localisation.ToObject<Models.ModelDataLocalisation>().Name);
             }
 
-            return listCommunes;
+            return listLocalisation;
         }
 
 

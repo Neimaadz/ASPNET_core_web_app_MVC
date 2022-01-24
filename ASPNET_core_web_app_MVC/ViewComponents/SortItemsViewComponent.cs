@@ -19,9 +19,9 @@ namespace ASPNET_core_web_app_MVC.ViewComponents
             listTypes = HomeController.ReadTypesJSON();
             ViewBag.Types = listTypes;
 
-            List<string> listCommunes = new List<string>();
-            listCommunes = HomeController.ReadCommunesJSON();
-            ViewBag.Communes = listCommunes;
+            List<string> listLocalisations = new List<string>();
+            listLocalisations = HomeController.ReadLocalisationsJSON();
+            ViewBag.Localisations = listLocalisations;
 
             // get arguments from session in purpose to post in view form
             ViewBag.Search = HttpContext.Session.GetString("search");

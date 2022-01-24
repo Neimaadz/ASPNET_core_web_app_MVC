@@ -10,5 +10,6 @@ namespace ASPNET_core_web_app_MVC.Models
         public string Type { get; set; }
         public string Localisation { get; set; }
         public string Description { get; set; }
+        public string Image { get; set; }
     }
 }
