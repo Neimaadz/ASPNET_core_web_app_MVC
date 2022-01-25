@@ -153,7 +153,16 @@ namespace ASPNET_core_web_app_MVC.Controllers
         {
             List<Item> ListItems = ReadItemsJSON(); // to find the highest id in ALL items list
             int itemId = ListItems.Max(item => item.ItemId);    // find the highest id
-            string uniqueFileName = UploadedFile(itemCredential.Image);
+            string uniqueFileName;
+
+            if (itemCredential.Image != null)
+            {
+                uniqueFileName = UploadedFile(itemCredential.Image);
+            }
+            else
+            {
+                uniqueFileName = "no_image.png";
+            }
 
             Item item = new Item()
             {
@@ -179,7 +188,16 @@ namespace ASPNET_core_web_app_MVC.Controllers
         public IActionResult EditItems(int itemId, [FromForm] Item item, [FromForm] IFormFile image)
         {
             Item itemtoEdit = FindItemByItemId(itemId);
-            string uniqueFileName = UploadedFile(image);
+            string uniqueFileName;
+
+            if (image != null)
+            {
+                uniqueFileName = UploadedFile(image);
+            }
+            else
+            {
+                uniqueFileName = "no_image.png";
+            }
 
             if (itemtoEdit.UserId == Int32.Parse(User.FindFirstValue("id")))
             {
@@ -456,6 +474,14 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         void EditItemByItemId(int itemId, Item item, string image)
         {
+            // delete file associated to item
+            var BeforeEditTheItem = FindItemByItemId(itemId);   // Getting image before apply edition on the item (sended from form)
+            if (BeforeEditTheItem.Image != null && BeforeEditTheItem.Image != "no_image.png")
+            {
+                string itemImagePath = Path.Combine(webHostEnvironment.WebRootPath, "images") + "/" + BeforeEditTheItem.Image;
+                System.IO.File.Delete(itemImagePath);
+            }
+
             List<Item> Items = ReadItemsJSON(); // name is important to write with this specific name in JSON
             var currentUserId = Int32.Parse(User.FindFirstValue("id"));  // get the user id from token
 
@@ -471,11 +497,6 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 }
             });
 
-            // delete file associated to item
-            var myItem = FindItemByItemId(itemId);
-            string itemImagePath = Path.Combine(webHostEnvironment.WebRootPath, "images") + "/" + myItem.Image;
-            System.IO.File.Delete(itemImagePath);
-
             var allItems = new { Items };   // Permet d'ajouter la propriété "Items" dans JSON
 
             string json = JsonConvert.SerializeObject(allItems, Formatting.Indented);
@@ -483,12 +504,19 @@ namespace ASPNET_core_web_app_MVC.Controllers
             System.IO.File.WriteAllText(UriItemsJSON, json);
         }
 
-
         // =======================================================================
         // Delete Item by itemId
         // =======================================================================
         void DeleteItemByItemId(int itemId)
         {
+            // delete file associated to item
+            var item = FindItemByItemId(itemId);
+            if (item.Image != null && item.Image != "no_image.png") // avoid the unauthorize access exception by checking if image is null
+            {
+                string itemImagePath = Path.Combine(webHostEnvironment.WebRootPath, "images") + "/" + item.Image;
+                System.IO.File.Delete(itemImagePath);
+            }
+
             int index = 0;
             List<Item> Items = ReadItemsJSON(); // name is important to write with this specific name in JSON
             var currentUserId = Int32.Parse(User.FindFirstValue("id"));  // get the user id from token
@@ -496,11 +524,6 @@ namespace ASPNET_core_web_app_MVC.Controllers
             // Utilisation du ForEach() au lieu de LinQ car qu'une seule unique ID
             Items.ForEach(x => { if (x.ItemId.Equals(itemId) && x.UserId.Equals(currentUserId)) index=Items.IndexOf(x); });
             Items.RemoveAt(index);
-
-            // delete file associated to item
-            var item = FindItemByItemId(itemId);
-            string itemImagePath = Path.Combine(webHostEnvironment.WebRootPath, "images") + "/" + item.Image;
-            System.IO.File.Delete(itemImagePath);
 
             var allItems = new { Items };   // Permet d'ajouter la propriété "Items" dans JSON
 
@@ -547,7 +570,6 @@ namespace ASPNET_core_web_app_MVC.Controllers
             string json = JsonConvert.SerializeObject(allItems, Formatting.Indented);
             // Permet d'écrire sur le fichier new.json
             System.IO.File.WriteAllText(UriItemsJSON, json);
-
         }
 
 

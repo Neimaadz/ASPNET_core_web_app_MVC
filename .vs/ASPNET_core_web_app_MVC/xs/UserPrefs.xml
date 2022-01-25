@@ -2,8 +2,8 @@
   <MonoDevelop.Ide.Workbench ActiveDocument="ASPNET_core_web_app_MVC/Controllers/HomeController.cs">
     <Files>
       <File FileName="ASPNET_core_web_app_MVC/Data/Items.json" Line="16" Column="39" />
-      <File FileName="ASPNET_core_web_app_MVC/Controllers/HomeController.cs" Line="460" Column="87" />
-      <File FileName="ASPNET_core_web_app_MVC/Views/Home/Items.cshtml" Line="59" Column="76" />
+      <File FileName="ASPNET_core_web_app_MVC/Controllers/HomeController.cs" Line="489" Column="83" />
+      <File FileName="ASPNET_core_web_app_MVC/Views/Home/Items.cshtml" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
