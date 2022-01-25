@@ -15,7 +15,7 @@
 
     @await Component.InvokeAsync("SortItemsViewComponent")
 
-    <table class="table table-striped">
+    <table class="table table-hover">
         <thead>
             <tr>
                 <th scope="col"></th>
@@ -33,13 +33,16 @@
             {
                 <tr>
                     <td>
-                        <img src="~/images/@item.Image"
-                             class="rounded-circle"
-                             height="40" width="40"
-                             asp-append-version="true" />
+                        <a href="items/details/@item.ItemId">
+
+                            <img src="~/images/@item.Image"
+                                 class="rounded-circle"
+                                 height="40" width="40"
+                                 asp-append-version="true" />
+                        </a>
                     </td>
                     <td>
-                        @item.Name
+                        <a href="items/details/@item.ItemId">@item.Name</a>
                     </td>
                     <td>
                         @item.Date

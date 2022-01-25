@@ -187,7 +187,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         [HttpPost("items/edit/{itemId}")]
         public IActionResult EditItems(int itemId, [FromForm] Item item, [FromForm] IFormFile image)
         {
-            Item itemtoEdit = FindItemByItemId(itemId);
+            Item itemToEdit = FindItemByItemId(itemId);
             string uniqueFileName;
 
             if (image != null)
@@ -199,7 +199,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 uniqueFileName = "no_image.png";
             }
 
-            if (itemtoEdit.UserId == Int32.Parse(User.FindFirstValue("id")))
+            if (itemToEdit.UserId == Int32.Parse(User.FindFirstValue("id")))
             {
                 EditItemByItemId(itemId, item, uniqueFileName);
                 return RedirectToAction("Items");
@@ -223,6 +223,28 @@ namespace ASPNET_core_web_app_MVC.Controllers
             {
                 DeleteItemByItemId(itemId);
                 return RedirectToAction("Items");
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+
+        // =======================================================================
+        // Details item
+        // =======================================================================
+        [HttpGet("items/details/{itemId}")]
+        public IActionResult DetailsItems(int itemId)
+        {
+            var currentUserId = Int32.Parse(User.FindFirstValue("id"));  // get the user id from token
+
+            if (currentUserId == FindItemByItemId(itemId).UserId)   // check on ALL the list of item
+            {
+                Item item = FindUserItemByItemId(itemId);   // get ONLY user's item
+                ViewBag.DetailsItems = item;
+
+                return View();
             }
             else
             {
@@ -462,6 +484,20 @@ namespace ASPNET_core_web_app_MVC.Controllers
         {
             Item item = new Item();
             List<Item> listItems = ReadItemsJSON();
+
+            // Utilisation du ForEach() au lieu de LinQ car qu'une seule unique ID
+            listItems.ForEach(x => { if (x.ItemId.Equals(itemId)) item = x; });
+            return item;
+        }
+
+
+        // =======================================================================
+        // Find ONLY user's item by itemId
+        // =======================================================================
+        Item FindUserItemByItemId(int itemId)
+        {
+            Item item = new Item();
+            List<Item> listItems = ReadUserItems();
 
             // Utilisation du ForEach() au lieu de LinQ car qu'une seule unique ID
             listItems.ForEach(x => { if (x.ItemId.Equals(itemId)) item = x; });
