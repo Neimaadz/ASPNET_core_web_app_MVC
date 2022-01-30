@@ -15,13 +15,11 @@ namespace ASPNET_core_web_app_MVC.ViewComponents
     {
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            List<string> listTypes = new List<string>();
-            listTypes = HomeController.ReadTypesJSON();
-            ViewBag.Types = listTypes;
+            List<string> types = HomeController.ReadTypesJSON();
+            ViewBag.Types = types;
 
-            List<string> listLocalisations = new List<string>();
-            listLocalisations = HomeController.ReadLocalisationsJSON();
-            ViewBag.Localisations = listLocalisations;
+            List<string> localisations = HomeController.ReadLocalisationsJSON();
+            ViewBag.Localisations = localisations;
 
             // get arguments from session in purpose to post in view form
             ViewBag.Search = HttpContext.Session.GetString("search");

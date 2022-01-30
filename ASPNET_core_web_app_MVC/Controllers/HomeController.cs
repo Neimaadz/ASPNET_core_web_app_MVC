@@ -63,23 +63,20 @@ namespace ASPNET_core_web_app_MVC.Controllers
             HttpContext.Session.Remove("sort");
             HttpContext.Session.Remove("direction");
 
-            List<Item> listItems = new List<Item>();
-            listItems = ReadUserItems(); // read only user's items
+            List<Item> items = ReadUserItems(); // read only user's items
 
-            return Items(listItems);
+            return Items(items);
         }
 
-        public IActionResult Items(List<Item> listItems)
+        public IActionResult Items(List<Item> items)
         {
-            List<string> listTypes = new List<string>();
-            listTypes = ReadTypesJSON();
-            ViewBag.Types = listTypes;
+            List<string> types = ReadTypesJSON();
+            ViewBag.Types = types;
 
-            List<string> listLocalisations = new List<string>();
-            listLocalisations = ReadLocalisationsJSON();
-            ViewBag.Localisations = listLocalisations;
+            List<string> localisations = ReadLocalisationsJSON();
+            ViewBag.Localisations = localisations;
 
-            return View("Items", listItems);
+            return View("Items", items);
         }
 
         // =======================================================================
@@ -111,10 +108,9 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 HttpContext.Session.SetString("direction", direction);
             }
 
-            List<Item> listItems = new List<Item>();
-            listItems = SearchUserItems(search, type, localisation, sort, direction);
+            List<Item> searchedItems = SearchUserItems(search, type, localisation, sort, direction);
 
-            return Items(listItems);
+            return Items(searchedItems);
         }
 
         [HttpPost("items/ResetSearchItems")]
@@ -137,13 +133,11 @@ namespace ASPNET_core_web_app_MVC.Controllers
         [HttpGet("items/add")]
         public IActionResult AddItems()
         {
-            List<string> listTypes = new List<string>();
-            listTypes = ReadTypesJSON();
-            ViewBag.Types = listTypes;
+            List<string> types = ReadTypesJSON();
+            ViewBag.Types = types;
 
-            List<string> listLocalisations = new List<string>();
-            listLocalisations = ReadLocalisationsJSON();
-            ViewBag.Localisations = listLocalisations;
+            List<string> localisations = ReadLocalisationsJSON();
+            ViewBag.Localisations = localisations;
 
             return View();
         }
@@ -151,13 +145,13 @@ namespace ASPNET_core_web_app_MVC.Controllers
         [HttpPost("items/add")]  // define route : https://localhost:<port>/items
         public IActionResult AddItems([FromForm] ItemCredential itemCredential)
         {
-            List<Item> ListItems = ReadItemsJSON(); // to find the highest id in ALL items list
-            int itemId = ListItems.Max(item => item.ItemId);    // find the highest id
+            List<Item> items = ReadItemsJSON(); // to find the highest id in ALL items list
+            int itemId = items.Max(item => item.ItemId);    // find the highest id
             string uniqueFileName;
 
             if (itemCredential.Image != null)
             {
-                uniqueFileName = UploadedFile(itemCredential.Image);
+                uniqueFileName = UploadFile(itemCredential.Image);
             }
             else
             {
@@ -192,7 +186,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
             if (image != null)
             {
-                uniqueFileName = UploadedFile(image);
+                uniqueFileName = UploadFile(image);
             }
             else
             {
@@ -239,10 +233,18 @@ namespace ASPNET_core_web_app_MVC.Controllers
         {
             var currentUserId = Int32.Parse(User.FindFirstValue("id"));  // get the user id from token
 
-            if (currentUserId == FindItemByItemId(itemId).UserId)   // check on ALL the list of item
+            if (currentUserId == FindItemByItemId(itemId).UserId || User.IsInRole("admin"))   // check on ALL the list of item
             {
-                Item item = FindUserItemByItemId(itemId);   // get ONLY user's item
-                ViewBag.DetailsItems = item;
+                if (User.IsInRole("admin")) // ADMIN have authorization
+                {
+                    Item item = FindItemByItemId(itemId);
+                    ViewBag.DetailsItems = item;
+                }
+                else
+                {
+                    Item item = FindUserItemByItemId(itemId);   // get ONLY user's item
+                    ViewBag.DetailsItems = item;
+                }
 
                 return View();
             }
@@ -260,10 +262,22 @@ namespace ASPNET_core_web_app_MVC.Controllers
         [HttpGet("users")]
         public IActionResult Users()
         {
-            List<User> allUsers = new List<User>();
-            allUsers = ReadUsersXML();
+            List<Tuple<User, List<Item>>> searchedUsersItems = new List<Tuple<User, List<Item>>>();
+            return View(searchedUsersItems);
+        }
 
-            return View(allUsers);
+        public IActionResult Users(List<Tuple<User, List<Item>>> searchedUsersItems)
+        {
+            return View("Users", searchedUsersItems);
+        }
+
+        [Authorize(Roles = "admin")]    // use role to authorize
+        [HttpPost("users")]
+        public IActionResult SearchUsers([FromForm] string username)
+        {
+            List<Tuple<User, List<Item>>> searchedUsersItems = SearchUsersItemsByName(username);
+
+            return Users(searchedUsersItems);
         }
 
 
@@ -307,10 +321,9 @@ namespace ASPNET_core_web_app_MVC.Controllers
             }
             else
             {
-                List<User> allUsers = new List<User>();
-                allUsers = ReadUsersXML();
+                List<User> users = ReadUsersXML();
 
-                if (!IsUserAlreadyExist(allUsers, user))
+                if (!IsUserAlreadyExist(users, user))
                 {
                     ViewBag.user = user;
                     WriteUserXML(user);
@@ -398,21 +411,57 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
 
         // =======================================================================
-        // Search only User's Items
+        // Search Users and items associated : search users and user's items by username
+        // =======================================================================
+        List<Tuple<User, List<Item>>> SearchUsersItemsByName(string username)
+        {
+            List<Tuple<User, List<Item>>> searchedUsersItems = new List<Tuple<User, List<Item>>>();
+
+            List<User> users = ReadUsersXML();
+            List<Item> items = ReadItemsJSON();
+
+            var myQuery = from user in users
+                          where (user.Username).ToLower().Contains(username.ToLower())
+                          join item in items on user.Id equals item.UserId
+                          select new
+                          {
+                              user = user,
+                              item = item
+                          }
+                          into responseQuery // résultat de la requête dans responseQuery
+                          group responseQuery by responseQuery.user;
+
+            foreach (var userQuery in myQuery)
+            {
+                List<Item> itemsResult = new List<Item>();
+
+                foreach (var item in userQuery)
+                {
+                    itemsResult.Add(item.item);
+                }
+                searchedUsersItems.Add(new Tuple<User, List<Item>>(userQuery.Key, itemsResult));
+            }
+
+            return searchedUsersItems;
+        }
+
+
+        // =======================================================================
+        // Search/filter/sort only User's Items
         // =======================================================================
         List<Item> SearchUserItems(string search, string type, string localisation, string sort, string direction)
         {
-            List<Item> listResultItems = new List<Item>();
+            List<Item> searchedItems = new List<Item>();
 
             // Définir ma source de données
-            var listItems = ReadItemsJSON();
+            var items = ReadItemsJSON();
             var currentUserId = Int32.Parse(User.FindFirstValue("id"));  // get the user id from token
-            var query = listItems.Where(items => items.UserId == currentUserId);
+            var query = items.Where(items => items.UserId == currentUserId);
 
             // Appel de la requête
             foreach (var item in query)
             {
-                listResultItems.Add(item);
+                searchedItems.Add(item);
             }
 
             var propertyInfo = typeof(Item);
@@ -420,60 +469,60 @@ namespace ASPNET_core_web_app_MVC.Controllers
             // use PREVIOUS list to restrict area sort and filter
             if (direction == "ASC")
             {
-                var myQuery = listResultItems.OrderBy(x => propertyInfo.GetProperty(sort).GetValue(x, null)); // get property of Sort;
-                listResultItems = new List<Item>(); // clear the PREVIOUS list in order to add new params sort and filter elements
+                var myQuery = searchedItems.OrderBy(x => propertyInfo.GetProperty(sort).GetValue(x, null)); // get property of Sort;
+                searchedItems = new List<Item>(); // clear the PREVIOUS list in order to add new params sort and filter elements
 
                 foreach (var item in myQuery.ToList())
                 {
-                    listResultItems.Add(item);
+                    searchedItems.Add(item);
                 }
 
             }
             if (direction == "DSC")
             {
-                var myQuery = listResultItems.OrderByDescending(x => propertyInfo.GetProperty(sort).GetValue(x, null));
-                listResultItems = new List<Item>();
+                var myQuery = searchedItems.OrderByDescending(x => propertyInfo.GetProperty(sort).GetValue(x, null));
+                searchedItems = new List<Item>();
 
                 foreach (var item in myQuery.ToList())
                 {
-                    listResultItems.Add(item);
+                    searchedItems.Add(item);
                 }
 
             }
             if (type != null)
             {
-                var myQuery = listResultItems.Where(items => items.Type == type);
-                listResultItems = new List<Item>();
+                var myQuery = searchedItems.Where(items => items.Type == type);
+                searchedItems = new List<Item>();
 
                 foreach (var item in myQuery.ToList())
                 {
-                    listResultItems.Add(item);
+                    searchedItems.Add(item);
                 }
 
             }
             if (localisation != null)
             {
-                var myQuery = listResultItems.Where(items => items.Localisation == localisation);
-                listResultItems = new List<Item>();
+                var myQuery = searchedItems.Where(items => items.Localisation == localisation);
+                searchedItems = new List<Item>();
 
                 foreach (var item in myQuery.ToList())
                 {
-                    listResultItems.Add(item);
+                    searchedItems.Add(item);
                 }
             }
             if (search != null)
             {
-                var myQuery = listResultItems.Where(items => items.UserId == currentUserId &&
+                var myQuery = searchedItems.Where(items => items.UserId == currentUserId &&
                 items.Name.ToLower().Contains(search.ToLower()));
-                listResultItems = new List<Item>();
+                searchedItems = new List<Item>();
 
                 foreach (var item in myQuery.ToList())
                 {
-                    listResultItems.Add(item);
+                    searchedItems.Add(item);
                 }
             }
 
-            return listResultItems;
+            return searchedItems;
         }
 
 
@@ -483,10 +532,10 @@ namespace ASPNET_core_web_app_MVC.Controllers
         Item FindItemByItemId(int itemId)
         {
             Item item = new Item();
-            List<Item> listItems = ReadItemsJSON();
+            List<Item> items = ReadItemsJSON();
 
             // Utilisation du ForEach() au lieu de LinQ car qu'une seule unique ID
-            listItems.ForEach(x => { if (x.ItemId.Equals(itemId)) item = x; });
+            items.ForEach(x => { if (x.ItemId.Equals(itemId)) item = x; });
             return item;
         }
 
@@ -497,10 +546,10 @@ namespace ASPNET_core_web_app_MVC.Controllers
         Item FindUserItemByItemId(int itemId)
         {
             Item item = new Item();
-            List<Item> listItems = ReadUserItems();
+            List<Item> userItems = ReadUserItems();
 
             // Utilisation du ForEach() au lieu de LinQ car qu'une seule unique ID
-            listItems.ForEach(x => { if (x.ItemId.Equals(itemId)) item = x; });
+            userItems.ForEach(x => { if (x.ItemId.Equals(itemId)) item = x; });
             return item;
         }
 
@@ -508,13 +557,13 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         // Edit Item
         // =======================================================================
-        void EditItemByItemId(int itemId, Item item, string image)
+        void EditItemByItemId(int itemId, Item currentItem, string image)
         {
             // delete file associated to item
-            var BeforeEditTheItem = FindItemByItemId(itemId);   // Getting image before apply edition on the item (sended from form)
-            if (BeforeEditTheItem.Image != null && BeforeEditTheItem.Image != "no_image.png")
+            var item = FindItemByItemId(itemId);   // Getting image before apply edition on the item (sended from form)
+            if (item.Image != null && item.Image != "no_image.png")
             {
-                string itemImagePath = Path.Combine(webHostEnvironment.WebRootPath, "images") + "/" + BeforeEditTheItem.Image;
+                string itemImagePath = Path.Combine(webHostEnvironment.WebRootPath, "images") + "/" + item.Image;
                 System.IO.File.Delete(itemImagePath);
             }
 
@@ -525,10 +574,10 @@ namespace ASPNET_core_web_app_MVC.Controllers
             Items.ForEach(x => {
                 if (x.ItemId.Equals(itemId) && x.UserId.Equals(currentUserId))
                 {
-                    x.Name = item.Name;
-                    x.Type = item.Type;
-                    x.Localisation = item.Localisation;
-                    x.Description = item.Description;
+                    x.Name = currentItem.Name;
+                    x.Type = currentItem.Type;
+                    x.Localisation = currentItem.Localisation;
+                    x.Description = currentItem.Description;
                     x.Image = image;
                 }
             });
@@ -575,21 +624,41 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         List<Item> ReadUserItems()
         {
-            List<Item> listUserItems = new List<Item>();
+            List<Item> userItems = new List<Item>();
 
             // Définir ma source de données
-            var listItems = ReadItemsJSON();
+            var items = ReadItemsJSON();
             var currentUserId = Int32.Parse(User.FindFirstValue("id"));  // get the user id from token
 
-            var myQuery = listItems.Where(items => items.UserId == currentUserId);
+            var myQuery = items.Where(items => items.UserId == currentUserId);
 
             // Appel de la requête
             foreach (var item in myQuery)
             {
-                listUserItems.Add(item);
+                userItems.Add(item);
             }
 
-            return listUserItems;
+            return userItems;
+        }
+
+
+        // =======================================================================
+        // Read All items from JSON File
+        // =======================================================================
+        List<Item> ReadItemsJSON()
+        {
+            List<Item> items = new List<Item>();
+
+            var JSONFile = JObject.Parse(System.IO.File.ReadAllText(UriItemsJSON));
+            var myQuery = from item in JSONFile["Items"]
+                            select item;
+
+            foreach (var item in myQuery)
+            {
+                items.Add(item.ToObject<Item>());
+            }
+
+            return items;
         }
 
 
@@ -610,31 +679,11 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
 
         // =======================================================================
-        // Read All items from JSON File
-        // =======================================================================
-        List<Item> ReadItemsJSON()
-        {
-            List<Item> listItems = new List<Item>();
-
-            var JSONFile = JObject.Parse(System.IO.File.ReadAllText(UriItemsJSON));
-            var myQuery = from items in JSONFile["Items"]
-                            select items;
-
-            foreach (var item in myQuery)
-            {
-                listItems.Add(item.ToObject<Item>());
-            }
-
-            return listItems;
-        }
-
-
-        // =======================================================================
         // Read Users XML File : read all users from XML file
         // =======================================================================
         List<User> ReadUsersXML()
         {
-            List<User> listUsers = new List<User>();
+            List<User> users = new List<User>();
 
             var XMLFile = XElement.Load(UriUserXML);
             var myQuery = from element in XMLFile.Descendants("User")
@@ -643,14 +692,15 @@ namespace ASPNET_core_web_app_MVC.Controllers
                                Id = Convert.ToInt32(element.Element("Id").Value),
                                Username = element.Element("Username").Value,
                                Password = element.Element("Password").Value,
+                               Role = element.Element("Role").Value
                            };
 
             foreach (var user in myQuery)
             {
-                listUsers.Add(user);
+                users.Add(user);
             }
 
-            return listUsers;
+            return users;
         }
 
 
@@ -659,8 +709,8 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         void WriteUserXML(User user)
         {
-            List<User> listUsers = ReadUsersXML();
-            int userId = listUsers.Max(user => user.Id);    // find the highest id
+            List<User> users = ReadUsersXML();
+            int userId = users.Max(user => user.Id);    // find the highest id
 
             XDocument XMLFile = XDocument.Load(UriUserXML);
 
@@ -691,7 +741,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         // Upload file
         // =======================================================================
-        string UploadedFile(IFormFile image)
+        string UploadFile(IFormFile image)
         {
             string uniqueFileName = null;
 
@@ -731,19 +781,19 @@ namespace ASPNET_core_web_app_MVC.Controllers
         public static List<string> ReadTypesJSON()
         {
             string UriJSON = $@"{Directory.GetCurrentDirectory()}/Data/Types.json";
-            List<string> listTypes = new List<string>();
+            List<string> types = new List<string>();
 
             var JSONFile = JObject.Parse(System.IO.File.ReadAllText(UriJSON));
-            var myQuery = from types in JSONFile["Types"]
-                            orderby types["Name"] ascending
-                            select types;
+            var myQuery = from type in JSONFile["Types"]
+                            orderby type["Name"] ascending
+                            select type;
 
             foreach (var type in myQuery)
             {
-                listTypes.Add(type.ToObject<Models.ModelDataType>().Name);
+                types.Add(type.ToObject<Models.ModelDataType>().Name);
             }
 
-            return listTypes;
+            return types;
         }
 
         // =======================================================================
@@ -752,7 +802,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         public static List<string> ReadLocalisationsJSON()
         {
             string UriJSON = $@"{Directory.GetCurrentDirectory()}/Data/Localisations.json";
-            List<string> listLocalisation = new List<string>();
+            List<string> localisations = new List<string>();
 
             var JSONFile = JObject.Parse(System.IO.File.ReadAllText(UriJSON));
             var myQuery = from localisation in JSONFile["Localisations"]
@@ -761,10 +811,10 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
             foreach (var localisation in myQuery)
             {
-                listLocalisation.Add(localisation.ToObject<Models.ModelDataLocalisation>().Name);
+                localisations.Add(localisation.ToObject<Models.ModelDataLocalisation>().Name);
             }
 
-            return listLocalisation;
+            return localisations;
         }
 
 

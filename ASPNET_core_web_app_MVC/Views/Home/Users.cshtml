@@ -1,4 +1,4 @@
-﻿@model List<User>
+﻿@model List<Tuple<User, List<Item>>>
 
 @{
     @*Layout = null;*@
@@ -12,10 +12,84 @@
     <title>All Users</title>
 </head>
 <body>
-    @foreach (var user in Model)
+    <form asp-controller="Home" asp-action="SearchUsers" method="post">
+        <input type="text" name="username" />
+        <input type="submit" value="search user" />
+    </form>
+
+    @if (Model.Count != 0)
     {
-        <span>User n°@user.Id @user.Username</span>
-        <br/>
+        @foreach (var users in Model)
+        {
+            var myCollapse = "myCollapse" + @users.Item1.Id;
+
+            <div id="accordion">
+                <div class="card">
+                    <div class="card-header" id="headingOne">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" data-toggle="collapse" data-target="#@myCollapse" aria-expanded="true" aria-controls="collapseOne">
+                                <span><strong>ID :</strong> @users.Item1.Id </span>
+                                <span><strong>Username :</strong> @users.Item1.Username </span>
+                                <span><strong>Role :</strong> @users.Item1.Role</span>
+                            </button>
+                        </h5>
+                    </div>
+
+                    <div id="@myCollapse" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                        <div class="card-body">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"></th>
+                                        <th scope="col">Name: </th>
+                                        <th scope="col">Ajouté le: </th>
+                                        <th scope="col">Type: </th>
+                                        <th scope="col">Localisation: </th>
+                                        <th scope="col">Description: </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @foreach (var item in users.Item2)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <a href="items/details/@item.ItemId">
+
+                                                    <img src="~/images/@item.Image"
+                                                            class="rounded-circle"
+                                                            height="40" width="40"
+                                                            asp-append-version="true" />
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="items/details/@item.ItemId">@item.Name</a>
+                                            </td>
+                                            <td>
+                                                @item.Date
+                                            </td>
+                                            <td>
+                                                @item.Type
+                                            </td>
+                                            <td>
+                                                @item.Localisation
+                                            </td>
+                                            <td>
+                                                @item.Description
+                                            </td>
+                                        </tr>
+                                        }
+                                    </tbody>
+
+                                </table>
+                            </div>
+                    </div>
+                </div>
+            </div>
+            
+
+        }
+
     }
 </body>
 </html>

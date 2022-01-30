@@ -18,4 +18,10 @@
     <Password>damien</Password>
     <Role>user</Role>
   </User>
+  <User>
+    <Id>5</Id>
+    <Username>te</Username>
+    <Password>te</Password>
+    <Role>user</Role>
+  </User>
 </Users>
