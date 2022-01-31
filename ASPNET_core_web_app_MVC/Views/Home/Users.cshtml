@@ -12,10 +12,11 @@
     <title>All Users</title>
 </head>
 <body>
-    <form asp-controller="Home" asp-action="SearchUsers" method="post">
-        <input type="text" name="username" />
-        <input type="submit" value="search user" />
+    <form asp-controller="Home" asp-action="SearchUsers" method="post" class="form-inline justify-content-center my-4">
+        <input class="form-control mr-sm-2 w-25" type="text" name="username" placeholder="Input username..." aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
     </form>
+
 
     @if (Model.Count != 0)
     {
@@ -57,9 +58,9 @@
                                                 <a href="items/details/@item.ItemId">
 
                                                     <img src="~/images/@item.Image"
-                                                            class="rounded-circle"
-                                                            height="40" width="40"
-                                                            asp-append-version="true" />
+                                                         class="rounded-circle"
+                                                         height="40" width="40"
+                                                         asp-append-version="true" />
                                                 </a>
                                             </td>
                                             <td>
@@ -78,15 +79,15 @@
                                                 @item.Description
                                             </td>
                                         </tr>
-                                        }
-                                    </tbody>
+                                    }
+                                </tbody>
 
-                                </table>
-                            </div>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-            
+
 
         }
 
