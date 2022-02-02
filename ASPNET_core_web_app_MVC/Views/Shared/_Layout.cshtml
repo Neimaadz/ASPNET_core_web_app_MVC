@@ -23,8 +23,8 @@
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="navbar-collapse collapse">
+                    <ul class="navbar-nav mr-auto">
                         @if (accessCookie != null)
                         {
                             <li class="nav-item">
@@ -49,14 +49,23 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Signin">Signin</a>
                             </li>
                         }
-                        else
-                        {
-                            @using (Html.BeginForm("Logout", "Home", FormMethod.Post))
-                            {
-                                <input type="submit" value="Disconnect" />
-                            }
-                        }
                     </ul>
+
+                    @if (accessCookie != null)
+                    {
+                        @using (Html.BeginForm("Logout", "Home", null, FormMethod.Post , null, new { id= "myForm" }))
+                        {
+                            <div class="btn-group">
+                                <input type="image" src="~/images/account.svg" height="40" width="40" class="rounded-circle dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"/>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <a class="dropdown-item" href="#">Profil</a>
+                                    <a class="dropdown-item" href="#">Settings</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="#" onclick="myForm.submit();">Disconnect</a>
+                                </div>
+                            </div>
+                        }
+                    }
                 </div>
             </div>
         </nav>
