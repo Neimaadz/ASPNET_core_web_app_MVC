@@ -26,6 +26,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
         private readonly IJwtAuth jwtAuth;
         private string UriUserXML = $@"{Directory.GetCurrentDirectory()}/Data/Users.xml";
         private string UriItemsJSON = $@"{Directory.GetCurrentDirectory()}/Data/Items.json";
+        private string[] allowedFile = new string[] { ".png", ".jpg", ".jpeg" };
 
         // public HomeController(ILogger<HomeController> logger)
         public HomeController(IJwtAuth jwtAuth, IWebHostEnvironment hostEnvironment)
@@ -151,7 +152,20 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
             if (itemCredential.Image != null)
             {
-                uniqueFileName = UploadFile(itemCredential.Image);
+                string fileExtension = Path.GetExtension(itemCredential.Image.FileName);
+
+                if (allowedFile.Contains(fileExtension))
+                {
+                    uniqueFileName = UploadFile(itemCredential.Image);
+                }
+                else
+                {
+                    ErrorViewModel error = new ErrorViewModel();
+                    error.StatusCode = StatusCodes.Status403Forbidden;
+                    error.Message = "Invalid file !";
+
+                    return View("Error", error);
+                }
             }
             else
             {
@@ -186,7 +200,20 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
             if (image != null)
             {
-                uniqueFileName = UploadFile(image);
+                string fileExtension = Path.GetExtension(image.FileName);
+
+                if (allowedFile.Contains(fileExtension))
+                {
+                    uniqueFileName = UploadFile(image);
+                }
+                else
+                {
+                    ErrorViewModel error = new ErrorViewModel();
+                    error.StatusCode = StatusCodes.Status403Forbidden;
+                    error.Message = "Invalid file !";
+
+                    return View("Error", error);
+                }
             }
             else
             {
@@ -754,6 +781,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 {
                     image.CopyTo(fileStream);
                 }
+
             }
             return uniqueFileName;
         }

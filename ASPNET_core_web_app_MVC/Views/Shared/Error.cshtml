@@ -3,8 +3,12 @@
     ViewData["Title"] = "Error";
 }
 
-<h1 class="text-danger">Error @Model.StatusCode</h1>
-<h2 class="text-danger">@Model.Message</h2>
+<div class="text-center my-5">
+    <h1 class="text-danger">Oups...</h1>
+    <h2 class="text-danger">It seems with got an error @Model.StatusCode</h2>
+    <h2 class="text-danger my-5">Message : @Model.Message</h2>
+    <a asp-area="" asp-controller="Home" asp-action="Index"><input type="button" class="btn btn-primary" value="back"/></a>
+</div>
 
 @*<h2 class="text-danger">An error occurred while processing your request.</h2>*@
 
