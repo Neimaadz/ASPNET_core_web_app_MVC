@@ -1,12 +1,10 @@
 ﻿<Properties StartupConfiguration="{9E2357FA-60E0-4D99-A025-563FCD73B012}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="ASPNET_core_web_app_MVC/Views/Home/Signin.cshtml">
+  <MonoDevelop.Ide.Workbench ActiveDocument="ASPNET_core_web_app_MVC/Views/Shared/_Layout.cshtml">
     <Files>
       <File FileName="ASPNET_core_web_app_MVC/Data/Users.xml" Line="12" Column="31" />
       <File FileName="ASPNET_core_web_app_MVC/Data/Items.json" />
-      <File FileName="ASPNET_core_web_app_MVC/Controllers/HomeController.cs" Line="374" Column="20" />
-      <File FileName="ASPNET_core_web_app_MVC/Views/Home/Login.cshtml" Line="1" Column="1" />
-      <File FileName="ASPNET_core_web_app_MVC/Views/Home/Signin.cshtml" Line="1" Column="1" />
-      <File FileName="ASPNET_core_web_app_MVC/Views/Shared/_Layout.cshtml" Line="50" Column="34" />
+      <File FileName="ASPNET_core_web_app_MVC/Controllers/HomeController.cs" Line="97" Column="14" />
+      <File FileName="ASPNET_core_web_app_MVC/Views/Shared/_Layout.cshtml" Line="61" Column="65" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -19,13 +17,12 @@
               <Node name="Models" expanded="True" />
               <Node name="ViewComponents" expanded="True" />
               <Node name="Views" expanded="True">
-                <Node name="Home" expanded="True">
-                  <Node name="Signin.cshtml" selected="True" />
-                </Node>
+                <Node name="Home" expanded="True" />
                 <Node name="Shared" expanded="True">
                   <Node name="Components" expanded="True">
                     <Node name="SortItemsViewComponent" expanded="True" />
                   </Node>
+                  <Node name="_Layout.cshtml" selected="True" />
                 </Node>
               </Node>
               <Node name="wwwroot" expanded="True">

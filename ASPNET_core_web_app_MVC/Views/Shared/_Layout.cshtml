@@ -3,6 +3,7 @@
     // get the token
     var accessCookie = Context.Request.Cookies["Authorization"];
     var isAdmin = User.IsInRole("admin");
+    var username = User.FindFirst("username")?.Value;
 }
 
 <!DOCTYPE html>
@@ -58,6 +59,7 @@
                             <div class="btn-group">
                                 <input type="image" src="~/images/account.svg" height="40" width="40" class="rounded-circle dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"/>
                                 <div class="dropdown-menu dropdown-menu-right">
+                                    <h6 class="dropdown-header">Hi @username !</h6>
                                     <a class="dropdown-item" href="#">Profil</a>
                                     <a class="dropdown-item" href="#">Settings</a>
                                     <div class="dropdown-divider"></div>
