@@ -1,11 +1,10 @@
 ﻿<Properties StartupConfiguration="{9E2357FA-60E0-4D99-A025-563FCD73B012}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="ASPNET_core_web_app_MVC/Views/Shared/Error.cshtml">
+  <MonoDevelop.Ide.Workbench ActiveDocument="ASPNET_core_web_app_MVC/Views/Home/Items.cshtml">
     <Files>
       <File FileName="ASPNET_core_web_app_MVC/Data/Users.xml" Line="12" Column="31" />
-      <File FileName="ASPNET_core_web_app_MVC/Data/Items.json" Line="37" Column="34" />
-      <File FileName="ASPNET_core_web_app_MVC/Controllers/HomeController.cs" Line="782" Column="46" />
-      <File FileName="ASPNET_core_web_app_MVC/Views/Shared/_Layout.cshtml" Line="62" Column="63" />
-      <File FileName="ASPNET_core_web_app_MVC/Views/Shared/Error.cshtml" Line="7" Column="59" />
+      <File FileName="ASPNET_core_web_app_MVC/Data/Items.json" Line="10" Column="19" />
+      <File FileName="ASPNET_core_web_app_MVC/Controllers/HomeController.cs" Line="470" Column="69" />
+      <File FileName="ASPNET_core_web_app_MVC/Views/Home/Items.cshtml" Line="25" Column="38" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -18,12 +17,13 @@
               <Node name="Models" expanded="True" />
               <Node name="ViewComponents" expanded="True" />
               <Node name="Views" expanded="True">
-                <Node name="Home" expanded="True" />
+                <Node name="Home" expanded="True">
+                  <Node name="Items.cshtml" selected="True" />
+                </Node>
                 <Node name="Shared" expanded="True">
                   <Node name="Components" expanded="True">
                     <Node name="SortItemsViewComponent" expanded="True" />
                   </Node>
-                  <Node name="Error.cshtml" selected="True" />
                 </Node>
               </Node>
               <Node name="wwwroot" expanded="True">

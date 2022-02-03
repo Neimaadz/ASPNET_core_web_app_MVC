@@ -419,6 +419,77 @@ namespace ASPNET_core_web_app_MVC.Controllers
             return RedirectToAction("login");
         }
 
+        // =======================================================================
+        // Export my items to file JSON 
+        // =======================================================================
+        [HttpGet("exportJson")]
+        public IActionResult ExportJSON()
+        {
+            // Création du fichier à download contenant nos Items en JSON
+            string UriMyItemsJSON = $@"{Directory.GetCurrentDirectory()}/Data/myItemsJSON.json";
+            List<Item> Items = ReadUserItems();
+            var allItems = new { Items };
+
+            string json = JsonConvert.SerializeObject(allItems, Formatting.Indented);
+            System.IO.File.WriteAllText(UriMyItemsJSON, json);
+
+            // Préparation pour le download
+            var net = new System.Net.WebClient();
+            var data = net.DownloadData(UriMyItemsJSON);
+            var content = new System.IO.MemoryStream(data);
+            var contentType = "APPLICATION/octet-stream";
+            var fileName = "myItems.json";
+
+            System.IO.File.Delete(UriMyItemsJSON);
+            return File(content, contentType, fileName);
+        }
+
+        // =======================================================================
+        // Export my items to file XML 
+        // =======================================================================
+        [HttpGet("exportXml")]
+        public IActionResult ExportXML()
+        {
+            // Création du fichier à download contenant nos Items en JSON
+            string UriMyItemsJSON = $@"{Directory.GetCurrentDirectory()}/Data/myItemsJSON.json";
+            List<Item> Items = ReadUserItems();
+            var allItems = new { Items };
+
+            string json = JsonConvert.SerializeObject(allItems, Formatting.Indented);
+            System.IO.File.WriteAllText(UriMyItemsJSON, json);
+
+            // Convertir JSON en XML
+            string UriMyItemsXML = $@"{Directory.GetCurrentDirectory()}/Data/myItemsXML.xml";
+            var myJObject = JObject.Parse(json);    // on parse pour obtenir un JObject
+            var xml = new XDocument(
+                new XElement("Items",                  // XML Noeud Parent/Root
+                    myJObject["Items"].Select(c =>       // On selectionne dans notre Objet JSON
+                        new XElement("item",           // XML Noeuds enfants
+                            new XElement("ItemId", (string)c["ItemId"]),
+                            new XElement("UserId", (string)c["UserId"]),
+                            new XElement("Name", (string)c["Name"]),
+                            new XElement("Date", (string)c["Date"]),
+                            new XElement("Localisation", (string)c["Localisation"]),
+                            new XElement("Description", (string)c["Description"]),
+                            new XElement("Image", (string)c["Image"])
+                        )
+                    )
+                )
+            );
+            xml.Save(UriMyItemsXML);    // save le fichier XML pour qu'on puisse le download
+
+            // Préparation pour le download
+            var net = new System.Net.WebClient();
+            var data = net.DownloadData(UriMyItemsXML);
+            var content = new System.IO.MemoryStream(data);
+            var contentType = "APPLICATION/octet-stream";
+            var fileName = "myItems.xml";
+
+            System.IO.File.Delete(UriMyItemsJSON);
+            System.IO.File.Delete(UriMyItemsXML);
+            return File(content, contentType, fileName);
+        }
+
 
 
         /*
