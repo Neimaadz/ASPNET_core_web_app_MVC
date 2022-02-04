@@ -575,7 +575,6 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 {
                     searchedItems.Add(item);
                 }
-
             }
             if (direction == "DSC")
             {
@@ -586,7 +585,6 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 {
                     searchedItems.Add(item);
                 }
-
             }
             if (type != null)
             {
@@ -597,7 +595,6 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 {
                     searchedItems.Add(item);
                 }
-
             }
             if (localisation != null)
             {
@@ -659,27 +656,40 @@ namespace ASPNET_core_web_app_MVC.Controllers
         void EditItemByItemId(int itemId, Item currentItem, string image)
         {
             // delete file associated to item
-            var item = FindItemByItemId(itemId);   // Getting image before apply edition on the item (sended from form)
-            if (item.Image != null && item.Image != "no_image.png")
+            var itemFound = FindItemByItemId(itemId);   // Getting image before apply edition on the item (sended from form)
+            if (itemFound.Image != null && itemFound.Image != "no_image.png")
             {
-                string itemImagePath = Path.Combine(webHostEnvironment.WebRootPath, "images") + "/" + item.Image;
+                string itemImagePath = Path.Combine(webHostEnvironment.WebRootPath, "images") + "/" + itemFound.Image;
                 System.IO.File.Delete(itemImagePath);
             }
 
-            List<Item> Items = ReadItemsJSON(); // name is important to write with this specific name in JSON
+            var Items = ReadItemsJSON(); // name is important to write with this specific name in JSON
             var currentUserId = Int32.Parse(User.FindFirstValue("id"));  // get the user id from token
 
             // Utilisation du ForEach() au lieu de LinQ car qu'une seule unique ID
-            Items.ForEach(x => {
-                if (x.ItemId.Equals(itemId) && x.UserId.Equals(currentUserId))
-                {
-                    x.Name = currentItem.Name;
-                    x.Type = currentItem.Type;
-                    x.Localisation = currentItem.Localisation;
-                    x.Description = currentItem.Description;
-                    x.Image = image;
-                }
-            });
+            //Items.ForEach(x => {
+            //    if (x.ItemId.Equals(itemId) && x.UserId.Equals(currentUserId))
+            //    {
+            //        x.Name = currentItem.Name;
+            //        x.Type = currentItem.Type;
+            //        x.Localisation = currentItem.Localisation;
+            //        x.Description = currentItem.Description;
+            //        x.Image = image;
+            //    }
+            //});
+
+            var myQuery = from item in Items
+                          where item.ItemId.Equals(itemId) && item.UserId.Equals(currentUserId)
+                          select item;
+
+            foreach (var item in myQuery)
+            {
+                item.Name = currentItem.Name;
+                item.Type = currentItem.Type;
+                item.Localisation = currentItem.Localisation;
+                item.Description = currentItem.Description;
+                item.Image = image;
+            }
 
             var allItems = new { Items };   // Permet d'ajouter la propriété "Items" dans JSON
 
@@ -694,20 +704,31 @@ namespace ASPNET_core_web_app_MVC.Controllers
         void DeleteItemByItemId(int itemId)
         {
             // delete file associated to item
-            var item = FindItemByItemId(itemId);
-            if (item.Image != null && item.Image != "no_image.png") // avoid the unauthorize access exception by checking if image is null
+            var itemFound = FindItemByItemId(itemId);
+            if (itemFound.Image != null && itemFound.Image != "no_image.png") // avoid the unauthorize access exception by checking if image is null
             {
-                string itemImagePath = Path.Combine(webHostEnvironment.WebRootPath, "images") + "/" + item.Image;
+                string itemImagePath = Path.Combine(webHostEnvironment.WebRootPath, "images") + "/" + itemFound.Image;
                 System.IO.File.Delete(itemImagePath);
             }
 
-            int index = 0;
-            List<Item> Items = ReadItemsJSON(); // name is important to write with this specific name in JSON
+            var Items = ReadItemsJSON(); // name is important to write with this specific name in JSON
             var currentUserId = Int32.Parse(User.FindFirstValue("id"));  // get the user id from token
 
             // Utilisation du ForEach() au lieu de LinQ car qu'une seule unique ID
-            Items.ForEach(x => { if (x.ItemId.Equals(itemId) && x.UserId.Equals(currentUserId)) index=Items.IndexOf(x); });
-            Items.RemoveAt(index);
+            //int index = 0;
+            //Items.ForEach(x => { if (x.ItemId.Equals(itemId) && x.UserId.Equals(currentUserId)) index=Items.IndexOf(x); });
+            //Items.RemoveAt(index);
+
+            Item itemToDelete = new Item();
+            var myQuery = from item in Items
+                          where item.ItemId.Equals(itemId) && item.UserId.Equals(currentUserId)
+                          select item;
+
+            foreach (var item in myQuery)
+            {
+                itemToDelete = item;
+            }
+            Items.Remove(itemToDelete);
 
             var allItems = new { Items };   // Permet d'ajouter la propriété "Items" dans JSON
 
