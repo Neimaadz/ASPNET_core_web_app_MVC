@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
@@ -144,19 +145,19 @@ namespace ASPNET_core_web_app_MVC.Controllers
         }
 
         [HttpPost("items/add")]  // define route : https://localhost:<port>/items
-        public IActionResult AddItems([FromForm] ItemCredential itemCredential)
+        public IActionResult AddItems([FromForm] Item item, [FromForm] IFormFile image)
         {
             List<Item> items = ReadItemsJSON(); // to find the highest id in ALL items list
             int itemId = items.Max(item => item.ItemId);    // find the highest id
             string uniqueFileName;
 
-            if (itemCredential.Image != null)
+            if (image != null)
             {
-                string fileExtension = Path.GetExtension(itemCredential.Image.FileName);
+                string fileExtension = Path.GetExtension(image.FileName);
 
                 if (allowedFile.Contains(fileExtension))
                 {
-                    uniqueFileName = UploadFile(itemCredential.Image);
+                    uniqueFileName = UploadFile(image);
                 }
                 else
                 {
@@ -172,19 +173,19 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 uniqueFileName = "no_image.png";
             }
 
-            Item item = new Item()
+            Item newItem = new Item()
             {
                 ItemId = itemId + 1,
                 UserId = Int32.Parse(User.FindFirstValue("id")),
-                Name = itemCredential.Name,
+                Name = item.Name,
                 Date = DateTime.Now.ToString("dd/MM/yyyy HH:mm"),
-                Type = itemCredential.Type,
-                Localisation = itemCredential.Localisation,
-                Description = itemCredential.Description,
+                Type = item.Type,
+                Localisation = item.Localisation,
+                Description = item.Description,
                 Image = uniqueFileName,
             };
 
-            WriteItemJSON(item);
+            WriteItemJSON(newItem);
 
             return RedirectToAction("Items");
         }
@@ -465,10 +466,11 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 new XElement("Items",                  // XML Noeud Parent/Root
                     myJObject["Items"].Select(c =>       // On selectionne dans notre Objet JSON
                         new XElement("item",           // XML Noeuds enfants
-                            new XElement("ItemId", (string)c["ItemId"]),
-                            new XElement("UserId", (string)c["UserId"]),
+                            new XElement("ItemId", (int)c["ItemId"]),
+                            new XElement("UserId", (int)c["UserId"]),
                             new XElement("Name", (string)c["Name"]),
                             new XElement("Date", (string)c["Date"]),
+                            new XElement("Type", (string)c["Type"]),
                             new XElement("Localisation", (string)c["Localisation"]),
                             new XElement("Description", (string)c["Description"]),
                             new XElement("Image", (string)c["Image"])
@@ -549,10 +551,11 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         List<Item> SearchUserItems(string search, string type, string localisation, string sort, string direction)
         {
-            List<Item> searchedItems = new List<Item>();
+            List<ItemDTO> searchedItems = new List<ItemDTO>();
+            var propertyInfo = typeof(ItemDTO);     // get the type
 
             // Définir ma source de données
-            var items = ReadItemsJSON();
+            var items = ItemToDTO(ReadItemsJSON());
             var currentUserId = Int32.Parse(User.FindFirstValue("id"));  // get the user id from token
             var query = items.Where(items => items.UserId == currentUserId);
 
@@ -562,13 +565,11 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 searchedItems.Add(item);
             }
 
-            var propertyInfo = typeof(Item);
-
             // use PREVIOUS list to restrict area sort and filter
             if (direction == "ASC")
             {
-                var myQuery = searchedItems.OrderBy(x => propertyInfo.GetProperty(sort).GetValue(x, null)); // get property of Sort;
-                searchedItems = new List<Item>(); // clear the PREVIOUS list in order to add new params sort and filter elements
+                var myQuery = searchedItems.OrderBy(x => propertyInfo.GetProperty(sort).GetValue(x, null)); // get the value of the property equal to "sort" ;
+                searchedItems = new List<ItemDTO>(); // clear the PREVIOUS list in order to add new params sort and filter elements
 
                 foreach (var item in myQuery.ToList())
                 {
@@ -579,7 +580,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
             if (direction == "DSC")
             {
                 var myQuery = searchedItems.OrderByDescending(x => propertyInfo.GetProperty(sort).GetValue(x, null));
-                searchedItems = new List<Item>();
+                searchedItems = new List<ItemDTO>();
 
                 foreach (var item in myQuery.ToList())
                 {
@@ -590,7 +591,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
             if (type != null)
             {
                 var myQuery = searchedItems.Where(items => items.Type == type);
-                searchedItems = new List<Item>();
+                searchedItems = new List<ItemDTO>();
 
                 foreach (var item in myQuery.ToList())
                 {
@@ -601,7 +602,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
             if (localisation != null)
             {
                 var myQuery = searchedItems.Where(items => items.Localisation == localisation);
-                searchedItems = new List<Item>();
+                searchedItems = new List<ItemDTO>();
 
                 foreach (var item in myQuery.ToList())
                 {
@@ -612,7 +613,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
             {
                 var myQuery = searchedItems.Where(items => items.UserId == currentUserId &&
                 items.Name.ToLower().Contains(search.ToLower()));
-                searchedItems = new List<Item>();
+                searchedItems = new List<ItemDTO>();
 
                 foreach (var item in myQuery.ToList())
                 {
@@ -620,7 +621,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 }
             }
 
-            return searchedItems;
+            return DTOtoItem(searchedItems);
         }
 
 
@@ -749,11 +750,11 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
             var JSONFile = JObject.Parse(System.IO.File.ReadAllText(UriItemsJSON));
             var myQuery = from item in JSONFile["Items"]
-                            select item;
+                            select item.ToObject<Item>();
 
             foreach (var item in myQuery)
             {
-                items.Add(item.ToObject<Item>());
+                items.Add(item);
             }
 
             return items;
@@ -855,6 +856,58 @@ namespace ASPNET_core_web_app_MVC.Controllers
 
             }
             return uniqueFileName;
+        }
+
+        // =======================================================================
+        // Item to DTO
+        // =======================================================================
+        List<ItemDTO> ItemToDTO(List<Item> items)
+        {
+            List<ItemDTO> itemsDTO = new List<ItemDTO>();
+
+            foreach (var item in items)
+            {
+                ItemDTO itemDTO = new ItemDTO
+                {
+                    ItemId = item.ItemId,
+                    UserId = item.UserId,
+                    Name = item.Name,
+                    Date = DateTime.ParseExact(item.Date, "g", new CultureInfo("fr-FR")),
+                    Type = item.Type,
+                    Localisation = item.Localisation,
+                    Description = item.Description,
+                    Image = item.Image,
+                };
+                itemsDTO.Add(itemDTO);
+            }
+
+            return itemsDTO;
+        }
+
+        // =======================================================================
+        // DTO to Item
+        // =======================================================================
+        List<Item> DTOtoItem(List<ItemDTO> itemsDTO)
+        {
+            List<Item> items = new List<Item>();
+
+            foreach (var itemDTO in itemsDTO)
+            {
+                Item item = new Item
+                {
+                    ItemId = itemDTO.ItemId,
+                    UserId = itemDTO.UserId,
+                    Name = itemDTO.Name,
+                    Date = itemDTO.Date.ToString("dd/MM/yyyy HH:mm"),
+                    Type = itemDTO.Type,
+                    Localisation = itemDTO.Localisation,
+                    Description = itemDTO.Description,
+                    Image = itemDTO.Image,
+                };
+                items.Add(item);
+            }
+
+            return items;
         }
 
 

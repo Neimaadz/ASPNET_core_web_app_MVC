@@ -1,10 +1,10 @@
 ﻿<Properties StartupConfiguration="{9E2357FA-60E0-4D99-A025-563FCD73B012}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="ASPNET_core_web_app_MVC/Views/Home/Items.cshtml">
+  <MonoDevelop.Ide.Workbench ActiveDocument="ASPNET_core_web_app_MVC/Controllers/HomeController.cs">
     <Files>
       <File FileName="ASPNET_core_web_app_MVC/Data/Users.xml" Line="12" Column="31" />
       <File FileName="ASPNET_core_web_app_MVC/Data/Items.json" Line="10" Column="19" />
-      <File FileName="ASPNET_core_web_app_MVC/Controllers/HomeController.cs" Line="470" Column="69" />
-      <File FileName="ASPNET_core_web_app_MVC/Views/Home/Items.cshtml" Line="25" Column="38" />
+      <File FileName="ASPNET_core_web_app_MVC/Controllers/HomeController.cs" Line="861" Column="70" />
+      <File FileName="ASPNET_core_web_app_MVC/Views/Home/Items.cshtml" Line="76" Column="43" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -12,14 +12,14 @@
           <Node name="ASPNET_core_web_app_MVC" expanded="True">
             <Node name="ASPNET_core_web_app_MVC" expanded="True">
               <Node name="Authentication" expanded="True" />
-              <Node name="Controllers" expanded="True" />
+              <Node name="Controllers" expanded="True">
+                <Node name="HomeController.cs" selected="True" />
+              </Node>
               <Node name="Data" expanded="True" />
               <Node name="Models" expanded="True" />
               <Node name="ViewComponents" expanded="True" />
               <Node name="Views" expanded="True">
-                <Node name="Home" expanded="True">
-                  <Node name="Items.cshtml" selected="True" />
-                </Node>
+                <Node name="Home" expanded="True" />
                 <Node name="Shared" expanded="True">
                   <Node name="Components" expanded="True">
                     <Node name="SortItemsViewComponent" expanded="True" />
