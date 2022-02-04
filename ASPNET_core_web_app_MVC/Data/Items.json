@@ -8,7 +8,7 @@
       "Type": "Randonnée",
       "Localisation": "Saint-Philippe",
       "Description": "Le piton de la Fournaise, culminant à 2 632 mètres d'altitude, est le volcan actif de l'île de La Réunion, département et région d'outre-mer de France, située dans l'océan Indien.",
-      "Image": "0681818e-a8d0-43b7-afab-b91ad70f5218_Ile_de_La_Réunion_-_Piton_de_la_Fournaise.jpg"
+      "Image": "7526e6ed-ace6-49ba-afe2-f4f56b842a8c_Ile_de_La_Réunion_-_Piton_de_la_Fournaise.jpg"
     },
     {
       "ItemId": 17,
@@ -21,16 +21,6 @@
       "Image": "no_image.png"
     },
     {
-      "ItemId": 19,
-      "UserId": 2,
-      "Name": "Be Lounge",
-      "Date": "25/01/2022 23:49",
-      "Type": "Restaurant",
-      "Localisation": "Saint-Philippe",
-      "Description": "BONSOIR",
-      "Image": "no_image.png"
-    },
-    {
       "ItemId": 20,
       "UserId": 5,
       "Name": "daa",
@@ -38,26 +28,6 @@
       "Type": "Boite de nuit",
       "Localisation": "Entre-Deux",
       "Description": "dazda",
-      "Image": "no_image.png"
-    },
-    {
-      "ItemId": 22,
-      "UserId": 2,
-      "Name": "Hotel California",
-      "Date": "30/01/2022 23:44",
-      "Type": "Hotel",
-      "Localisation": "Entre-Deux",
-      "Description": "Eagle - Hotel California",
-      "Image": "no_image.png"
-    },
-    {
-      "ItemId": 23,
-      "UserId": 2,
-      "Name": "AAAAAA",
-      "Date": "04/02/2022 22:26",
-      "Type": "Bar",
-      "Localisation": "Entre-Deux",
-      "Description": "dzaaz",
       "Image": "no_image.png"
     }
   ]

@@ -893,7 +893,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
                     ItemId = item.ItemId,
                     UserId = item.UserId,
                     Name = item.Name,
-                    Date = DateTime.ParseExact(item.Date, "g", new CultureInfo("fr-FR")),
+                    Date = DateTime.ParseExact(item.Date, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture),
                     Type = item.Type,
                     Localisation = item.Localisation,
                     Description = item.Description,
