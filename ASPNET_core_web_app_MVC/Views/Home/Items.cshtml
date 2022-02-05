@@ -40,7 +40,7 @@
             {
                 <tr>
                     <td>
-                        <a href="items/details/@item.ItemId">
+                        <a asp-controller="Home" asp-action="DetailsItems" asp-route-itemId="@item.ItemId">
 
                             <img src="~/images/@item.Image"
                                  class="rounded-circle"
@@ -49,7 +49,7 @@
                         </a>
                     </td>
                     <td>
-                        <a href="items/details/@item.ItemId">@item.Name</a>
+                        <a asp-controller="Home" asp-action="DetailsItems" asp-route-itemId="@item.ItemId">@item.Name</a>
                     </td>
                     <td>
                         @item.Date

@@ -1,27 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Users>
   <User>
-    <Id>2</Id>
-    <Username>test</Username>
-    <Password>test</Password>
-    <Role>user</Role>
-  </User>
-  <User>
-    <Id>3</Id>
+    <Id>1</Id>
     <Username>admin</Username>
     <Password>admin</Password>
     <Role>admin</Role>
   </User>
   <User>
-    <Id>4</Id>
+    <Id>2</Id>
     <Username>damien</Username>
     <Password>damien</Password>
     <Role>user</Role>
   </User>
   <User>
-    <Id>5</Id>
-    <Username>te</Username>
-    <Password>te</Password>
+    <Id>3</Id>
+    <Username>darwin</Username>
+    <Password>darwin</Password>
     <Role>user</Role>
   </User>
 </Users>
