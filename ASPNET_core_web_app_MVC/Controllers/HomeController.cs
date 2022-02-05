@@ -551,11 +551,11 @@ namespace ASPNET_core_web_app_MVC.Controllers
         // =======================================================================
         List<Item> SearchUserItems(string search, string type, string localisation, string sort, string direction)
         {
-            List<ItemDTO> searchedItems = new List<ItemDTO>();
-            var propertyInfo = typeof(ItemDTO);     // get the type
+            List<ItemWithDateTime> searchedItems = new List<ItemWithDateTime>();
+            var propertyInfo = typeof(ItemWithDateTime);     // get the type
 
             // Définir ma source de données
-            var items = ItemToDTO(ReadItemsJSON());
+            var items = MapperItemToItemWithDateTimeType(ReadItemsJSON());
             var currentUserId = Int32.Parse(User.FindFirstValue("id"));  // get the user id from token
             var query = items.Where(items => items.UserId == currentUserId);
 
@@ -569,7 +569,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
             if (direction == "ASC")
             {
                 var myQuery = searchedItems.OrderBy(x => propertyInfo.GetProperty(sort).GetValue(x, null)); // get the value of the property equal to "sort" ;
-                searchedItems = new List<ItemDTO>(); // clear the PREVIOUS list in order to add new params sort and filter elements
+                searchedItems = new List<ItemWithDateTime>(); // clear the PREVIOUS list in order to add new params sort and filter elements
 
                 foreach (var item in myQuery.ToList())
                 {
@@ -579,7 +579,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
             if (direction == "DSC")
             {
                 var myQuery = searchedItems.OrderByDescending(x => propertyInfo.GetProperty(sort).GetValue(x, null));
-                searchedItems = new List<ItemDTO>();
+                searchedItems = new List<ItemWithDateTime>();
 
                 foreach (var item in myQuery.ToList())
                 {
@@ -589,7 +589,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
             if (type != null)
             {
                 var myQuery = searchedItems.Where(items => items.Type == type);
-                searchedItems = new List<ItemDTO>();
+                searchedItems = new List<ItemWithDateTime>();
 
                 foreach (var item in myQuery.ToList())
                 {
@@ -599,7 +599,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
             if (localisation != null)
             {
                 var myQuery = searchedItems.Where(items => items.Localisation == localisation);
-                searchedItems = new List<ItemDTO>();
+                searchedItems = new List<ItemWithDateTime>();
 
                 foreach (var item in myQuery.ToList())
                 {
@@ -610,7 +610,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
             {
                 var myQuery = searchedItems.Where(items => items.UserId == currentUserId &&
                 items.Name.ToLower().Contains(search.ToLower()));
-                searchedItems = new List<ItemDTO>();
+                searchedItems = new List<ItemWithDateTime>();
 
                 foreach (var item in myQuery.ToList())
                 {
@@ -618,7 +618,7 @@ namespace ASPNET_core_web_app_MVC.Controllers
                 }
             }
 
-            return DTOtoItem(searchedItems);
+            return MapperItemWithDateTimeTypeToItem(searchedItems);
         }
 
 
@@ -735,7 +735,6 @@ namespace ASPNET_core_web_app_MVC.Controllers
             string json = JsonConvert.SerializeObject(allItems, Formatting.Indented);
             // Permet d'écrire sur le fichier new.json
             System.IO.File.WriteAllText(UriItemsJSON, json);
-
         }
 
 
@@ -880,15 +879,15 @@ namespace ASPNET_core_web_app_MVC.Controllers
         }
 
         // =======================================================================
-        // Item to DTO
+        // Mapper Item to Item with DateTime type
         // =======================================================================
-        List<ItemDTO> ItemToDTO(List<Item> items)
+        List<ItemWithDateTime> MapperItemToItemWithDateTimeType(List<Item> items)
         {
-            List<ItemDTO> itemsDTO = new List<ItemDTO>();
+            List<ItemWithDateTime> itemsWithDateTime = new List<ItemWithDateTime>();
 
             foreach (var item in items)
             {
-                ItemDTO itemDTO = new ItemDTO
+                ItemWithDateTime itemWithDateTime = new ItemWithDateTime
                 {
                     ItemId = item.ItemId,
                     UserId = item.UserId,
@@ -899,31 +898,31 @@ namespace ASPNET_core_web_app_MVC.Controllers
                     Description = item.Description,
                     Image = item.Image,
                 };
-                itemsDTO.Add(itemDTO);
+                itemsWithDateTime.Add(itemWithDateTime);
             }
 
-            return itemsDTO;
+            return itemsWithDateTime;
         }
 
         // =======================================================================
-        // DTO to Item
+        // Mapper Item with DateTime type to Item
         // =======================================================================
-        List<Item> DTOtoItem(List<ItemDTO> itemsDTO)
+        List<Item> MapperItemWithDateTimeTypeToItem(List<ItemWithDateTime> itemsWithDateTime)
         {
             List<Item> items = new List<Item>();
 
-            foreach (var itemDTO in itemsDTO)
+            foreach (var itemWithDateTime in itemsWithDateTime)
             {
                 Item item = new Item
                 {
-                    ItemId = itemDTO.ItemId,
-                    UserId = itemDTO.UserId,
-                    Name = itemDTO.Name,
-                    Date = itemDTO.Date.ToString("dd/MM/yyyy HH:mm"),
-                    Type = itemDTO.Type,
-                    Localisation = itemDTO.Localisation,
-                    Description = itemDTO.Description,
-                    Image = itemDTO.Image,
+                    ItemId = itemWithDateTime.ItemId,
+                    UserId = itemWithDateTime.UserId,
+                    Name = itemWithDateTime.Name,
+                    Date = itemWithDateTime.Date.ToString("dd/MM/yyyy HH:mm"),
+                    Type = itemWithDateTime.Type,
+                    Localisation = itemWithDateTime.Localisation,
+                    Description = itemWithDateTime.Description,
+                    Image = itemWithDateTime.Image,
                 };
                 items.Add(item);
             }
